@@ -92,3 +92,15 @@ nonOptionalResult =? state == .finished => { 0 } =>? {
 ```
 
 Here ```=?``` is an operator which assign right value to the left local only if right value is not nil, otherwise it does not change it. The default result here was assigned to the ```nonOptionalResult``` at the initialization process.
+
+# How to use:
+
+```SwiftWhen``` source contains only one source file ```SwiftWhen.swift```, so the easiest way is to copy it inside your project as is.
+
+Another way is to add ```SwiftWhen``` as a subproject.
+
+In this case you will need to add importing in files where you want to use it.
+```swift
+import SwiftWhen
+```
+
