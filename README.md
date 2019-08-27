@@ -81,4 +81,14 @@ But to understand this you may think that:
 ```=>?``` works like ```else if``` (and it should contain ```=>``` in it's right part)
 ```=>!``` works like if and plays a role of a ```default``` statement.
 
+The reault of this operator's chain will be an optional ```Int```. If you whant to have ```Some``` Int you will find that it is imposible just to add ?? to the end of the chain to unwrap it. The possible solution could be:
+```swift
+var nonOptionalResult = 3
+nonOptionalResult =? state == .finished => { 0 } =>? {
+	state == .working || state == .pausing => { 1 } =>? {
+		state == .idle || state == .preparing || state == .ready => { 2 }
+	}
+}
+```
 
+Here ```=?``` is an operator which assign right value to the left local only if right value is not nil, otherwise it does not change it.
