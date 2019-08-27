@@ -210,5 +210,61 @@ class Tests: XCTestCase {
 		XCTAssert(false => false => false == false)
 		XCTAssert(false => true => false == true)
 	}
+	
+	func testExamplesFromReadme() {
+		var number = 0
+		let a = When(number)
+			.case(0) {"Invalid number"}
+			.case(1)
+			.case(2) {"Number is too low"}
+			.case(3) {"Number is correct"}
+			.case(4) {"Numbe is almost correct"}
+			.default("Number is too high")
+		
+		XCTAssert(a == "Invalid number")
+		
+		number = 10
+		let b = When<Int, String>(number)
+			.case(0) {"Invalid number"}
+			.case(1)
+			.case(2) {"Number is too low"}
+			.case(3) {"Number is correct"}
+			.case(4) {"Numbe is almost correct"}
+			.default(nil)
+		XCTAssert(b == nil)
+		let b1 = When(number)
+			.case(0) {"Invalid number"}
+			.case(1)
+			.case(2) {"Number is too low"}
+			.case(3) {"Number is correct"}
+			.case(4) {"Numbe is almost correct"}
+			.default(nil) ?? "Number is too high"
+		XCTAssert(b1 == "Number is too high")
+		
+		let c = when(number) {
+			return $0 >= 10 ? "Big number" : "Small number"
+		}
+		XCTAssert(c == "Big number")
+		let state: TestState = .wrong
+		let result = state == .finished => { 0 } =>? {
+			state == .working || state == .pausing => { 1 } =>? {
+				state == .idle || state == .preparing || state == .ready => { 2 } =>! {
+					3
+				}
+			}
+		}
+
+		XCTAssert(result == 3)
+		var nonOptionalResult = 3
+		nonOptionalResult =? state == .finished => { 0 } =>? {
+			state == .working || state == .pausing => { 1 } =>? {
+				state == .idle || state == .preparing || state == .ready => { 2 }
+			}
+		}
+
+		XCTAssert(nonOptionalResult == 3)
+	}
 }
+	
+
 
