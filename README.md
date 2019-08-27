@@ -52,5 +52,33 @@ let state = When<State, Int>(stateToTest)
 
 Note that  ```case``` with value could be used only for ```Equtable``` types while ```case``` with condition block could be used for any type.
 
+Sometimes you don't have many cases but the only one rule to make a result on one type from a value of another one.
+In this case you may use ```when``` - a global function to have it as a statement and be used inline.
+```swift
+let c = when(number) {
+	//Here could be any culculations 
+	return $0 >= 10 ? "Big number" : "Small number"
+}
+```
+
+# Operators:
+
+```SwiftWhen``` provides shorter way to achive expression of casting one value to another type value using some operators.
+This might be shorter but harder to read. 
+
+```swift
+let result = state == .finished => { 0 } =>? {
+	state == .working || state == .pausing => { 1 } =>? {
+		 state == .idle || state == .preparing || state == .ready => { 2 } =>! {
+			3
+		 }
+	}
+}
+```
+Comprehensive description of operators could be found in project wiki page https://github.com/smakeev/SwiftWhen/wiki. 
+But to understand this you may think that:
+```=>``` is an if statement. (Left part is a condition right is a then branch. 
+```=>?``` works like ```else if``` (and it should contain ```=>``` in it's right part)
+```=>!``` works like if and plays a role of a ```default``` statement.
 
 
