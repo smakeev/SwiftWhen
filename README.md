@@ -91,4 +91,4 @@ nonOptionalResult =? state == .finished => { 0 } =>? {
 }
 ```
 
-Here ```=?``` is an operator which assign right value to the left local only if right value is not nil, otherwise it does not change it.
+Here ```=?``` is an operator which assign right value to the left local only if right value is not nil, otherwise it does not change it. The default result here was assigned to the ```nonOptionalResult``` at the initialization process.
