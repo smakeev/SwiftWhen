@@ -27,12 +27,12 @@ class Tests: XCTestCase {
 		case finished
 		case wrong //be not active but only by default
 	}
-	
+
 	let unknown = 0
 	let notActive = 1
 	let active = 2
 	let finished = 3
-	
+
 	func checkRight(_ intState: Int, _ state: TestState) -> Bool {
 		switch state {
 		case .idle,
@@ -44,7 +44,7 @@ class Tests: XCTestCase {
 		default: return intState == unknown
 		}
 	}
-	
+
 	func helperTests(_ stateToTest: TestState) {
 		let state: TestState = stateToTest
 
@@ -59,10 +59,10 @@ class Tests: XCTestCase {
 			return result
 
 		}
-		
+
 		XCTAssert(checkRight(intState, state))
 	}
-	
+
 	func helper1Tests(_ stateToTest: TestState) {
 		let state: TestState = stateToTest
 
@@ -91,9 +91,9 @@ class Tests: XCTestCase {
 		}
 		XCTAssert(checkRight(intState, state))
 
-		
+
 	}
-	
+
 	func testChaining() {
 		var left: Int? = 1
 		var right: Int? = 2
@@ -115,7 +115,7 @@ class Tests: XCTestCase {
 		let result4 = left =>? { right } =>? { right1 } =>! { right2! }
 		XCTAssert(result4 == 4)
 	}
-	
+
 	func testWhen() {
 		helperTests(.idle)
 		helperTests(.preparing)
@@ -124,7 +124,7 @@ class Tests: XCTestCase {
 		helperTests(.pausing)
 		helperTests(.finished)
 		helperTests(.wrong)
-		
+
 		helper1Tests(.idle)
 		helper1Tests(.preparing)
 		helper1Tests(.ready)
@@ -132,7 +132,7 @@ class Tests: XCTestCase {
 		helper1Tests(.pausing)
 		helper1Tests(.finished)
 		helper1Tests(.wrong)
-		
+
 		helper2Tests(.idle)
 		helper2Tests(.preparing)
 		helper2Tests(.ready)
@@ -141,7 +141,7 @@ class Tests: XCTestCase {
 		helper2Tests(.finished)
 		helper2Tests(.wrong)
 	}
-	
+
 	func helperClassTest(_ stateToTest: TestState) {
 		let state = When(stateToTest)
 			.case(.idle)
@@ -153,7 +153,7 @@ class Tests: XCTestCase {
 			.default(unknown) ?? unknown
 		XCTAssert(checkRight(state, stateToTest))
 	}
-	
+
 	func helperClassBoolTest(_ stateToTest: TestState) {
 		let state = When<TestState, Int>(stateToTest)
 			.case({ $0 == .idle || $0 == .preparing || $0 == .ready}) { self.notActive }
@@ -162,7 +162,7 @@ class Tests: XCTestCase {
 			.default(unknown)
 		XCTAssert(checkRight(state!, stateToTest))
 	}
-	
+
 	func helperClassMixedTest(_ stateToTest: TestState) {
 			let state = When<TestState, Int>(stateToTest)
 			.case({ $0 == .idle || $0 == .preparing || $0 == .ready}) { self.notActive }
@@ -172,7 +172,7 @@ class Tests: XCTestCase {
 			.default(unknown)
 		XCTAssert(checkRight(state!, stateToTest))
 	}
-	
+
 	func testWhenClass() {
 		helperClassTest(.idle)
 		helperClassTest(.preparing)
@@ -181,7 +181,7 @@ class Tests: XCTestCase {
 		helperClassTest(.pausing)
 		helperClassTest(.finished)
 		helperClassTest(.wrong)
-		
+
 		helperClassBoolTest(.idle)
 		helperClassBoolTest(.preparing)
 		helperClassBoolTest(.ready)
@@ -189,7 +189,7 @@ class Tests: XCTestCase {
 		helperClassBoolTest(.pausing)
 		helperClassBoolTest(.finished)
 		helperClassBoolTest(.wrong)
-		
+
 		helperClassMixedTest(.idle)
 		helperClassMixedTest(.preparing)
 		helperClassMixedTest(.ready)
@@ -197,6 +197,18 @@ class Tests: XCTestCase {
 		helperClassMixedTest(.pausing)
 		helperClassMixedTest(.finished)
 		helperClassMixedTest(.wrong)
+	}
+
+	func testBooltoBoolOperatorImplication() {
+		XCTAssert(true => true == true)
+		XCTAssert(false => false == true)
+		XCTAssert(false => true == false)
+		XCTAssert(true => false == false)
+
+		XCTAssert(true => true => true == true)
+		XCTAssert(true => true => false == false)
+		XCTAssert(false => false => false == false)
+		XCTAssert(false => true => false == true)
 	}
 }
 
