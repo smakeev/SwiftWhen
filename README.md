@@ -43,9 +43,14 @@ let b1 = When(number)
 
 ```case``` could use not only a value but a condition block (``` (Type) -> Bool  ``` )
 ```swift
-	let state = When<State, Int>(stateToTest)
-		.case({ $0 == .idle || $0 == .preparing || $0 == .ready}) { 0 }
-		.case({ $0 == .working || $0 == .pausing}) { 1 }
-		.case({ $0 == .finished }) {2}
-		.default(3)
+let state = When<State, Int>(stateToTest)
+	.case({ $0 == .idle || $0 == .preparing || $0 == .ready}) { 0 }
+	.case({ $0 == .working || $0 == .pausing}) { 1 }
+	.case({ $0 == .finished }) {2}
+	.default(3)
 ```
+
+Note that  ```case``` with value could be used only for ```Equtable``` types while ```case``` with condition block could be used for any type.
+
+
+
