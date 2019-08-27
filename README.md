@@ -32,11 +32,20 @@ let b = When<Int, String>(number)
 As always ```When``` returns an ```optional```, so the resulttype is ```String?```
 If you whant ```When``` to return ```String``` instead do the following as one of possible solutions:
 ```swift
-let b1 = When<Int, String>(number)
+let b1 = When(number)
 	.case(0) {"Invalid number"}
 	.case(1)
 	.case(2) {"Number is too low"}
 	.case(3) {"Number is correct"}
 	.case(4) {"Numbe is almost correct"}
 	.default(nil) ?? "Number is too high"
+```
+
+```case``` could use not only a value but a condition block (``` (Type) -> Bool  ``` )
+```swift
+	let state = When<State, Int>(stateToTest)
+		.case({ $0 == .idle || $0 == .preparing || $0 == .ready}) { 0 }
+		.case({ $0 == .working || $0 == .pausing}) { 1 }
+		.case({ $0 == .finished }) {2}
+		.default(3)
 ```
