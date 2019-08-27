@@ -141,4 +141,62 @@ class Tests: XCTestCase {
 		helper2Tests(.finished)
 		helper2Tests(.wrong)
 	}
+	
+	func helperClassTest(_ stateToTest: TestState) {
+		let state = When(stateToTest)
+			.case(.idle)
+			.case(.preparing)
+			.case(.ready) {self.notActive}
+			.case(.working)
+			.case(.pausing) {self.active}
+			.case(.finished) {self.finished}
+			.default(unknown) ?? unknown
+		XCTAssert(checkRight(state, stateToTest))
+	}
+	
+	func helperClassBoolTest(_ stateToTest: TestState) {
+		let state = When<TestState, Int>(stateToTest)
+			.case({ $0 == .idle || $0 == .preparing || $0 == .ready}) { self.notActive }
+			.case({ $0 == .working || $0 == .pausing}) { self.active }
+			.case({ $0 == .finished }) {self.finished}
+			.default(unknown)
+		XCTAssert(checkRight(state!, stateToTest))
+	}
+	
+	func helperClassMixedTest(_ stateToTest: TestState) {
+			let state = When<TestState, Int>(stateToTest)
+			.case({ $0 == .idle || $0 == .preparing || $0 == .ready}) { self.notActive }
+			.case({ $0 == .working || $0 == .pausing}) { self.active }
+			.case(.finished) {self.finished}
+			.case(.wrong) {self.unknown}
+			.default(unknown)
+		XCTAssert(checkRight(state!, stateToTest))
+	}
+	
+	func testWhenClass() {
+		helperClassTest(.idle)
+		helperClassTest(.preparing)
+		helperClassTest(.ready)
+		helperClassTest(.working)
+		helperClassTest(.pausing)
+		helperClassTest(.finished)
+		helperClassTest(.wrong)
+		
+		helperClassBoolTest(.idle)
+		helperClassBoolTest(.preparing)
+		helperClassBoolTest(.ready)
+		helperClassBoolTest(.working)
+		helperClassBoolTest(.pausing)
+		helperClassBoolTest(.finished)
+		helperClassBoolTest(.wrong)
+		
+		helperClassMixedTest(.idle)
+		helperClassMixedTest(.preparing)
+		helperClassMixedTest(.ready)
+		helperClassMixedTest(.working)
+		helperClassMixedTest(.pausing)
+		helperClassMixedTest(.finished)
+		helperClassMixedTest(.wrong)
+	}
 }
+
