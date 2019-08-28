@@ -79,7 +79,7 @@ Comprehensive description of operators could be found in project wiki page https
 But to understand this you may think that:
 ```=>``` is an if statement. (Left part is a condition right is a then branch. 
 ```=>?``` works like ```else if``` (and it should contain ```=>``` in it's right part)
-```=>!``` works like if and plays a role of a ```default``` statement.
+```=>!``` works like ```else``` and plays a role of a ```default``` statement.
 
 The reault of this operator's chain will be an optional ```Int```. If you whant to have ```Some``` Int you will find that it is imposible just to add ?? to the end of the chain to unwrap it. The possible solution could be:
 ```swift
