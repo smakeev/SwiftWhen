@@ -52,6 +52,18 @@ let state = When<State, Int>(stateToTest)
 
 Note that  ```case``` with value could be used only for ```Equtable``` types while ```case``` with condition block could be used for any type.
 
+You can combine ```case``` types.
+```swift
+let b2 = When(number)
+	.case({$0 < 0}) {"Number should be > 0"}
+	.case(0) {"Invalid number"}
+	.case(1)
+	.case(2) {"Number is too low"}
+	.case(3) {"Number is correct"}
+	.case(4) {"Numbe is almost correct"}
+	.default(nil) ?? "Number is too high"
+```
+
 Sometimes you don't have many cases but the only one rule to make a result on one type from a value of another one.
 In this case you may use ```when``` - a global function to have it as a statement and be used inline.
 ```swift
