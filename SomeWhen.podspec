@@ -1,11 +1,11 @@
 Pod::Spec.new do |s|
   s.name = 'SomeWhen'
-  s.version = '0.1.0'
+  s.version = '0.1.1'
   s.license = 'MIT'
   s.summary = 'When operator for Swift'
   s.homepage = 'https://github.com/smakeev/SwiftWhen'
   s.authors = { 'Sergey Makeev' => 'makeev.87@gmaol.com' }
-  s.source = { :git => 'https://github.com/smakeev/SwiftWhen/SwiftWhen.git', :tag => s.version }
+  s.source = { :git => 'https://github.com/smakeev/SwiftWhen.git', :tag => s.version }
   s.documentation_url = 'https://github.com/smakeev/SwiftWhen/wiki'
 
   s.ios.deployment_target = '10.0'
