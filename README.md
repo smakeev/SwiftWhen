@@ -120,4 +120,7 @@ You may use cocoapods https://cocoapods.org/pods/SomeWhen
 ```
 pod "SomeWhen"
 ```
-Note, you will need add ```import SomeWhen```
+Note, you will need add 
+```swift 
+import SomeWhen
+```
