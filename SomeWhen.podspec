@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'SomeWhen'
-  s.version = '0.1.3'
+  s.version = '0.1.4'
   s.license = 'MIT'
   s.summary = 'When operator for Swift'
   s.homepage = 'https://github.com/smakeev/SwiftWhen'

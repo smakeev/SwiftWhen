@@ -9,7 +9,7 @@
 open class When<Type, Result> {
 	
 	private var what: Type
-	init(_ what: Type) {
+	public init(_ what: Type) {
 		self.what  = what
 		cases      = [(()->Result?)?]()
 		conditions = [(Type) -> Bool]()
@@ -18,13 +18,13 @@ open class When<Type, Result> {
 	private var cases: [(()->Result?)?]
 	private var conditions: [(Type) -> Bool]
 	
-	func `case`(_ condition: @escaping (Type) -> Bool,  handler: (() -> Result?)? = nil) -> When<Type, Result> {
+	public func `case`(_ condition: @escaping (Type) -> Bool,  handler: (() -> Result?)? = nil) -> When<Type, Result> {
 		cases.append(handler)
 		conditions.append(condition)
 		return self
 	}
 	
-	func `default`(_ defaultValue: Result?) -> Result? {
+	public func `default`(_ defaultValue: Result?) -> Result? {
 		var currentCase: (()->Result?)? = nil
 		for index in 0..<conditions.count {
 			if conditions[index](what) {
