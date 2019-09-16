@@ -116,3 +116,8 @@ In this case you will need to add importing in files where you want to use it.
 import SwiftWhen
 ```
 
+You may use cocoapods https://cocoapods.org/pods/SomeWhen
+```
+pod "SomeWhen"
+```
+Note, you will need add ```import SomeWhen```
