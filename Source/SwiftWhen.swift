@@ -6,7 +6,7 @@
 //  Copyright © 2019 SOME projects. All rights reserved.
 //
 
-class When<Type, Result> {
+open class When<Type, Result> {
 	
 	private var what: Type
 	init(_ what: Type) {
@@ -47,7 +47,7 @@ class When<Type, Result> {
 	}
 }
 
-extension When where Type: Equatable {
+public extension When where Type: Equatable {
 	func `case`(_ condition: Type,  handler: (() -> Result?)? = nil) -> When<Type, Result> {
 		cases.append(handler)
 		conditions.append({ what in
@@ -57,7 +57,7 @@ extension When where Type: Equatable {
 	}
 }
 
-func when<Type, ResultType> (_ source: Type, handler: (Type) -> ResultType) -> ResultType {
+public func when<Type, ResultType> (_ source: Type, handler: (Type) -> ResultType) -> ResultType {
 	return handler(source)
 }
 
@@ -83,11 +83,11 @@ infix operator =>?: OptionalLogicalFollowng
 infix operator =>!: OptionalLogicalFollowng
 
 
-func =? <Type>(lhs: inout Type, rhs: Type?) -> Void {
+public func =? <Type>(lhs: inout Type, rhs: Type?) -> Void {
 	lhs = rhs ?? lhs
 }
 
-func => (lhs: Bool, rhs: Bool) -> Bool {
+public func => (lhs: Bool, rhs: Bool) -> Bool {
 	let result = When<(Bool, Bool), Bool>((lhs, rhs))
 		.case({$0.0 && $0.1})
 		.case({!$0.0 && !$0.1}) {true}
@@ -96,17 +96,17 @@ func => (lhs: Bool, rhs: Bool) -> Bool {
 	return result ?? false
 }
 
-func => <Type>(lhs: Bool, rhs: () -> Type) -> Type? {
+public func => <Type>(lhs: Bool, rhs: () -> Type) -> Type? {
 	return lhs ? rhs() : nil
 }
 
-func =>? <Type>(lhs: Type?, rhs: ()->Type?) -> Type? {
+public func =>? <Type>(lhs: Type?, rhs: ()->Type?) -> Type? {
 	if lhs == nil {
 		return rhs()
 	}
 	return lhs
 }
 
-func =>! <Type>(lhs: Type?, rhs: ()->Type) -> Type {
+public func =>! <Type>(lhs: Type?, rhs: ()->Type) -> Type {
 	return lhs ?? rhs()
 }
