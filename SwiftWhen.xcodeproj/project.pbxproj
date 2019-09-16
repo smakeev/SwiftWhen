@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B61E7525230F134A0096B4E8 /* SwiftWhen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61E7524230F134A0096B4E8 /* SwiftWhen.swift */; };
 		B61E7532230F14550096B4E8 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61E7531230F14550096B4E8 /* Tests.swift */; };
 		B61E7534230F14550096B4E8 /* libSwiftWhen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B61E7521230F134A0096B4E8 /* libSwiftWhen.a */; };
-		B61E753A230F18010096B4E8 /* SwiftWhen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61E7524230F134A0096B4E8 /* SwiftWhen.swift */; };
+		B6510F9623303A6F008A55CB /* SwiftWhen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6510F9523303A6F008A55CB /* SwiftWhen.swift */; };
+		B6510F9723303A6F008A55CB /* SwiftWhen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6510F9523303A6F008A55CB /* SwiftWhen.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,10 +37,10 @@
 
 /* Begin PBXFileReference section */
 		B61E7521230F134A0096B4E8 /* libSwiftWhen.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSwiftWhen.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		B61E7524230F134A0096B4E8 /* SwiftWhen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftWhen.swift; sourceTree = "<group>"; };
 		B61E752F230F14550096B4E8 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B61E7531230F14550096B4E8 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
 		B61E7533230F14550096B4E8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B6510F9523303A6F008A55CB /* SwiftWhen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftWhen.swift; path = Source/SwiftWhen.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,7 +83,7 @@
 		B61E7523230F134A0096B4E8 /* SwiftWhen */ = {
 			isa = PBXGroup;
 			children = (
-				B61E7524230F134A0096B4E8 /* SwiftWhen.swift */,
+				B6510F9523303A6F008A55CB /* SwiftWhen.swift */,
 			);
 			path = SwiftWhen;
 			sourceTree = "<group>";
@@ -147,6 +147,7 @@
 				TargetAttributes = {
 					B61E7520230F134A0096B4E8 = {
 						CreatedOnToolsVersion = 10.3;
+						LastSwiftMigration = 1030;
 					};
 					B61E752E230F14550096B4E8 = {
 						CreatedOnToolsVersion = 10.3;
@@ -186,7 +187,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B61E7525230F134A0096B4E8 /* SwiftWhen.swift in Sources */,
+				B6510F9623303A6F008A55CB /* SwiftWhen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -195,7 +196,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B61E7532230F14550096B4E8 /* Tests.swift in Sources */,
-				B61E753A230F18010096B4E8 /* SwiftWhen.swift in Sources */,
+				B6510F9723303A6F008A55CB /* SwiftWhen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -329,11 +330,18 @@
 		B61E7529230F134A0096B4E8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6WLV67D2QG;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -342,8 +350,14 @@
 		B61E752A230F134A0096B4E8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6WLV67D2QG;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -355,6 +369,7 @@
 		B61E7538230F14550096B4E8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6WLV67D2QG;
 				INFOPLIST_FILE = Tests/Info.plist;
@@ -373,6 +388,7 @@
 		B61E7539230F14550096B4E8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6WLV67D2QG;
 				INFOPLIST_FILE = Tests/Info.plist;
