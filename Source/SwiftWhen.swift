@@ -7,27 +7,52 @@
 //
 
 open class When<Type, Result> {
-	
+
+	struct ConditionContainer {
+		var param:   ((Type) -> Bool)?
+		var noParam: (() -> Bool)?
+		
+		init(param: @escaping (Type) -> Bool) {
+			self.param = param
+		}
+		
+		init(noParam: @escaping () -> Bool) {
+			self.noParam = noParam
+		}
+	}
+
 	private var what: Type
 	public init(_ what: Type) {
 		self.what  = what
 		cases      = [(()->Result?)?]()
-		conditions = [(Type) -> Bool]()
+		conditions = [ConditionContainer]()
 	}
-	
+
 	private var cases: [(()->Result?)?]
-	private var conditions: [(Type) -> Bool]
+	private var conditions: [ConditionContainer]
 	
 	public func `case`(_ condition: @escaping (Type) -> Bool,  handler: (() -> Result?)? = nil) -> When<Type, Result> {
 		cases.append(handler)
-		conditions.append(condition)
+		conditions.append(ConditionContainer(param:condition))
+		return self
+	}
+	
+	public func `case`(_ condition: @escaping () -> Bool,  handler: (() -> Result?)? = nil) -> When<Type, Result> {
+		cases.append(handler)
+		conditions.append(ConditionContainer(noParam:condition))
 		return self
 	}
 	
 	public func `default`(_ defaultValue: Result?) -> Result? {
 		var currentCase: (()->Result?)? = nil
 		for index in 0..<conditions.count {
-			if conditions[index](what) {
+			var result: Bool = false
+			if let paramCondion = conditions[index].param {
+				result = paramCondion(what)
+			} else if let noParamCondition = conditions[index].noParam {
+				result = noParamCondition()
+			}
+			if result {
 				var currentIndex = index
 				while currentIndex < conditions.count {
 					currentCase = cases[currentIndex]
@@ -47,12 +72,18 @@ open class When<Type, Result> {
 	}
 }
 
+public extension When where Type == Bool {
+	convenience init() {
+		self.init(true)
+	}
+}
+
 public extension When where Type: Equatable {
 	func `case`(_ condition: Type,  handler: (() -> Result?)? = nil) -> When<Type, Result> {
 		cases.append(handler)
-		conditions.append({ what in
+		conditions.append(ConditionContainer(param:{ what in
 			return what == condition
-		})
+		}))
 		return self
 	}
 }

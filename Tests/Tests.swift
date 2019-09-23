@@ -264,7 +264,27 @@ class Tests: XCTestCase {
 
 		XCTAssert(nonOptionalResult == 3)
 	}
-}
 	
-
-
+	func testWhenWithNoParam() {
+		let z = 3
+		let result = When()
+		.case({ z == 1}) { 1 }
+		.case({ 100.2 == 100.3}) { 2 }
+		.case({ z == 3}) { 3 }
+		.case({"str" == "str"}) { -100 }
+		.default(nil) ?? 0
+		
+		XCTAssert(z == result)
+		
+		let result1 = When()
+			.case({0 == 10}) {0}
+			.case({15 > 7})
+			.case({0 > 6})
+			.case({100 < 3}) {1}
+			.case({3 == 3}) {2}
+			.case({true}) {3}
+			.default(nil) ?? 4
+		
+			XCTAssert(1 == result1)
+	}
+}
