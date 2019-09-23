@@ -73,6 +73,18 @@ let c = when(number) {
 }
 ```
 
+```When``` could be used without parameter
+
+```swift
+	let value = 3
+	let result = When()
+	    .case({ value == 1}) { 1 }
+	    .case({ 100.2 == 100.3}) { 2 }
+	    .case({ value >= 3}) { 3 }
+	    .case({"str" == "str"}) { -100 }
+	    .default(nil) ?? 0
+```
+
 # Operators:
 
 ```SwiftWhen``` provides shorter way to achive expression of casting one value to another type value using some operators.
