@@ -40,7 +40,7 @@
 		B61E752F230F14550096B4E8 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B61E7531230F14550096B4E8 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
 		B61E7533230F14550096B4E8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B6510F9523303A6F008A55CB /* SwiftWhen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftWhen.swift; path = Source/SwiftWhen.swift; sourceTree = SOURCE_ROOT; };
+		B6510F9523303A6F008A55CB /* SwiftWhen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftWhen.swift; path = Source/SwiftWhen.swift; sourceTree = SOURCE_ROOT; usesTabs = 1; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

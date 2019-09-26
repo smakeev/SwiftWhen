@@ -7,7 +7,7 @@
 //
 
 open class When<Type, Result> {
-
+	
 	struct ConditionContainer {
 		var param:   ((Type) -> Bool)?
 		var noParam: (() -> Bool)?
@@ -20,14 +20,14 @@ open class When<Type, Result> {
 			self.noParam = noParam
 		}
 	}
-
+	
 	private var what: Type
 	public init(_ what: Type) {
 		self.what  = what
 		cases      = [(()->Result?)?]()
 		conditions = [ConditionContainer]()
 	}
-
+	
 	private var cases: [(()->Result?)?]
 	private var conditions: [ConditionContainer]
 	
@@ -88,8 +88,16 @@ public extension When where Type: Equatable {
 	}
 }
 
-public func when<Type, ResultType> (_ source: Type, handler: (Type) -> ResultType) -> ResultType {
-	return handler(source)
+public func when<Type, ResultType> (_ source: Type?, handler: (Type) -> ResultType) -> ResultType? {
+	if let validSource = source {
+		return handler(validSource)
+	}
+	
+	return nil
+}
+
+public func with<Type>(_ source: Type, handler: (Type) -> Void) {
+	handler(source)
 }
 
 precedencegroup LogicalFollowng {
@@ -140,4 +148,44 @@ public func =>? <Type>(lhs: Type?, rhs: ()->Type?) -> Type? {
 
 public func =>! <Type>(lhs: Type?, rhs: ()->Type) -> Type {
 	return lhs ?? rhs()
+}
+
+public extension Optional {
+	func takeWhen(_ handler: (Wrapped) -> Bool) -> Wrapped? {
+		switch(self) {
+		case .some(let value):
+			if handler(value) {
+				return value
+			}
+		case _: return nil
+		}
+		
+		return nil
+	}
+	
+	func `let`<Result>(_ handler: (Wrapped) -> Result?) -> Result? {
+		switch(self) {
+		case .some(let value):
+			return handler(value)
+		case _: return nil
+		}
+	}
+	
+	func apply(_ handler: (Wrapped) -> Void) -> Wrapped? {
+		switch(self) {
+		case .some(let value):
+			handler(value)
+			return self
+		case _: return nil
+		}
+	}
+	
+	func run(_ handler: (Wrapped) -> Void) {
+		switch(self) {
+		case .some(let value):
+			handler(value)
+		case _: return
+		}
+		
+	}
 }
