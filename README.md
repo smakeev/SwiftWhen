@@ -79,9 +79,9 @@ let c = when(number) {
 	let value = 3
 	let result = When()
 	    .case({ value == 1}) { 1 }
-	    .case({ 100.2 == 100.3}) { 2 }
+	    .case(100.2 == 100.3) { 2 }
 	    .case({ value >= 3}) { 3 }
-	    .case({"str" == "str"}) { -100 }
+	    .case("str" == "str") { -100 }
 	    .default(nil) ?? 0
 ```
 
