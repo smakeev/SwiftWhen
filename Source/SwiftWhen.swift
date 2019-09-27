@@ -146,8 +146,13 @@ public extension When where Type: Equatable {
 			
 			if let handler = value as? (Type) -> Bool {
 				provider.case(handler)
+			} else if let handler = value as? () -> Bool {
+				let result = handler()
+				provider.case({result})
 			} else if let validValue = value as? Type {
 					provider.case(validValue )
+			} else if let validValue = value as? Bool {
+				provider.case({validValue})
 			} else {
 				provider.case({false})
 			}

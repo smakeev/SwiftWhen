@@ -574,7 +574,7 @@ class Tests: XCTestCase {
 			$0(1) => "One"
 			$0(2) => "Two"
 			$0(3) => "Three"
-			$0({true}) => "Four"
+			$0(false) => "Four"
 			$0({$0 == 5}) => {
 				return "Five"
 			}()
@@ -584,5 +584,39 @@ class Tests: XCTestCase {
 			$0(9) =>  "Nine"
 		}.default("dd")
 		XCTAssert(r3 == "Five")
+		
+		let n4 = 5
+		let r4 = When(.simple, n4) {
+			$0(0) => "Zero"
+			$0(1) => "One"
+			$0(2) => "Two"
+			$0(3) => "Three"
+			$0(false) => "Four"
+			$0(true) => {
+				return "Five"
+			}()
+			$0(6) => "Six"
+			$0(7) => "Seven"
+			$0(8) => "Eight"
+			$0(9) =>  "Nine"
+		}.default("dd")
+		XCTAssert(r4 == "Five")
+		
+		let n5 = 5
+		let r5 = When(.simple, n5) {
+			$0(0) => "Zero"
+			$0(1) => "One"
+			$0(2) => "Two"
+			$0(3) => "Three"
+			$0({false}) => "Four"
+			$0({true}) => {
+				return "Five"
+			}()
+			$0(6) => "Six"
+			$0(7) => "Seven"
+			$0(8) => "Eight"
+			$0(9) =>  "Nine"
+		}.default("dd")
+		XCTAssert(r5 == "Five")
 	}
 }
