@@ -60,7 +60,7 @@ class Tests: XCTestCase {
 
 		}
 
-		XCTAssert(checkRight(intState, state))
+		XCTAssert(checkRight(intState ?? -100, state))
 	}
 
 	func helper1Tests(_ stateToTest: TestState) {
@@ -74,7 +74,7 @@ class Tests: XCTestCase {
 			return result ?? unknown
 		}
 
-		XCTAssert(checkRight(intState, state))
+		XCTAssert(checkRight(intState ?? -100, state))
 	}
 
 	func helper2Tests(_ stateToTest: TestState) {
@@ -89,7 +89,7 @@ class Tests: XCTestCase {
 			}
 			return result
 		}
-		XCTAssert(checkRight(intState, state))
+		XCTAssert(checkRight(intState  ?? -100, state))
 
 
 	}
@@ -277,6 +277,7 @@ class Tests: XCTestCase {
 		XCTAssert(z == result)
 		
 		let result1 = When()
+			.case(3 > 5)
 			.case({0 == 10}) {0}
 			.case({15 > 7})
 			.case({0 > 6})
@@ -286,5 +287,198 @@ class Tests: XCTestCase {
 			.default(nil) ?? 4
 		
 			XCTAssert(1 == result1)
+	}
+	
+	class A1 {
+		var str: A2 = A2()
+		class A2 {
+			var str: A3 = A3()
+			class A3 {
+				var str: String = "A3"
+			}
+		}
+	}
+	
+	func testWith() {
+		let a = A1()
+		with(a.str.str) {
+			XCTAssert($0.str == "A3")
+		}
+	
+	}
+	
+	func testLet() {
+		let a: A1? = A1()
+		let str = a.let {
+			$0.str.str.str
+		}
+		XCTAssert(str == "A3")
+	}
+	
+	func testRunMethod() {
+		let a: A1? = A1()
+		a.run {
+			let str = $0.str.str.str
+			XCTAssert(str == "A3")
+		}
+	}
+	
+	func testApply() {
+		let a: A1? = A1()
+		_ = a?.str.str.str
+		a.apply {
+			$0.str.str.str = "New A3"
+		}
+		
+		a.map {
+			XCTAssert($0.str.str.str == "New A3")
+		}
+		
+		a.apply {
+			$0.str.str.str = "first iteration"
+		}.apply {
+			$0.str.str.str = "second iteration"
+		}.apply {
+			$0.str.str.str = "third iteration"
+		}
+
+		a.map {
+			XCTAssert($0.str.str.str == "third iteration")
+		}
+	}
+	
+	func testTakeWhen() {
+		var a: Int? = 2
+
+		if let validA = a.takeWhen({$0 > 1}) {
+			XCTAssert(validA == 2)
+		} else {
+			XCTAssert(false)
+		}
+		
+		a = 1
+		if let _ = a.takeWhen({$0 > 1}) {
+			XCTAssert(false)
+		} else {
+			XCTAssert(a == 1)
+		}
+
+		a = nil
+		if let _ = a.takeWhen({$0 > 1}) {
+			XCTAssert(false)
+		} else {
+			XCTAssert(a == nil)
+		}
+
+		a = 100
+		if let _ = a.takeWhen({$0 > 1}) {
+			XCTAssert(a == 100)
+		} else {
+			XCTAssert(false)
+		}
+		
+		if let validA = a.takeWhen({$0 > 1}).takeWhen({$0 == 100}) {
+			XCTAssert(validA == 100)
+		} else {
+			XCTAssert(false)
+		}
+	}
+	
+	func testWhenNewSyntax() {
+		let a = 5
+		let b = When(a) {
+			$0.case(0) { "Zero" }
+			$0.case(1) { "One"  }
+			$0.case(2) { "Two"  }
+			$0.case(3) { "Three"}
+			$0.case(4) { "Four" }
+			$0.case(5) { "Five" }
+			$0.case(6) { "Six"  }
+			$0.case(7) { "Seven"}
+			$0.case(8) { "Eight"}
+			$0.case(9) { "Nine" }
+		}.default(nil) ?? "Unknown"
+		XCTAssert(b == "Five")
+		
+		let c = When(a) {
+			$0.case({ $0 > 10 })
+			$0.case({$0 == 10})
+			$0.case(9)            { "Too much" }
+			$0.case({$0 == -100})
+			$0.case({$0 == -200})
+			$0.case({$0 == -300}) {"Unreal"}
+			$0.case(8)
+			$0.case(7)
+			$0.case(6)            { ">5"}
+			$0.case(5)            { "5"}
+			$0.case({$0 < 5})     {"Too low"}
+		}.default(nil) ?? "Unknown"
+		XCTAssert(c == "5")
+		
+		let d = When {
+			$0.case(3 > 5)
+			$0.case(6 > 20)
+			$0.case(false) {"No way"}
+			$0.case(true) {"true"}
+		}.default(nil) ?? "Default"
+		XCTAssert(d == "true")
+		
+		let d1 = When {
+			$0.case(3 > 5)
+			.case({$0 == false})
+			.case(6 > 20)
+			.case(false) {"No way"}
+			.case(true) {"true"}
+		}.default(nil) ?? "Default"
+		XCTAssert(d1 == "true")
+		
+		let d2 = When {
+			$0.case(3 > 5)
+			$0.case({$0 == false})
+			$0.case(6 > 20)
+			$0.case(false) => "No way"
+			$0.case(true) => "true"
+		}.default(nil) ?? "Default"
+		XCTAssert(d2 == "true")
+	}
+	
+	func testNewSyntax2() {
+		let a = 5
+		let b = When(a) {
+			$0.case(0) => "Zero"
+			$0.case(1) => "One"
+			$0.case(2) => "Two"
+			$0.case(3) => "Three"
+			$0.case(4) => "Four"
+			$0.case(5) => "Five"
+			$0.case(6) => "Six"
+			$0.case(7) => "Seven"
+			$0.case(8) => "Eight"
+			$0.case(9) =>  "Nine"
+		}.default(nil) ?? "Unknown"
+		XCTAssert(b == "Five")
+		
+		let b1 = When(a) {
+			$0.case(0) => "Zero"
+			$0.case(1) => "One"
+			$0.case(2)
+			.case(3)
+			.case(4)
+			$0.case(5) => "More than one, less then 6"
+			$0.case(6) => "Six"
+			$0.case(7) => "Seven"
+			$0.case(8) => "Eight"
+			$0.case(9) =>  "Nine"
+		}.default(nil) ?? "Unknown"
+		XCTAssert(b1 == "More than one, less then 6")
+		
+		let d2 = When {
+			$0.case(3 > 5)
+			.case({$0 == false})
+			.case(6 > 20)
+			.case(false) => "No way"
+			$0.case(true) => "true"
+		}.default(nil) ?? "Default"
+		XCTAssert(d2 == "true")
 	}
 }

@@ -6,8 +6,30 @@
 //  Copyright © 2019 SOME projects. All rights reserved.
 //
 
+
 open class When<Type, Result> {
-	
+
+	public class Case {
+		var owner: When
+		init(owner: When) {
+			self.owner = owner
+		}
+
+		@discardableResult public func `case`(_ condition: @escaping (Type) -> Bool,  handler: (() -> Result?)? = nil) -> Case {
+			owner.case(condition, handler: handler)
+			return self
+		}
+		@discardableResult public func `case`(_ condition: @escaping () -> Bool,  handler: (() -> Result?)? = nil) -> Case {
+			owner.case(condition, handler: handler)
+			return self
+		}
+		
+		fileprivate func add(_ result: Result?) {
+			owner.cases.remove(at: owner.cases.count - 1)
+			owner.cases.append({result})
+		}
+	}
+
 	struct ConditionContainer {
 		var param:   ((Type) -> Bool)?
 		var noParam: (() -> Bool)?
@@ -22,6 +44,13 @@ open class When<Type, Result> {
 	}
 	
 	private var what: Type
+	
+	public convenience init(_ what: Type, caseProvider: (Case) -> Void) {
+		self.init(what)
+		let provider = Case(owner: self)
+		caseProvider(provider)
+	}
+	
 	public init(_ what: Type) {
 		self.what  = what
 		cases      = [(()->Result?)?]()
@@ -31,13 +60,13 @@ open class When<Type, Result> {
 	private var cases: [(()->Result?)?]
 	private var conditions: [ConditionContainer]
 	
-	public func `case`(_ condition: @escaping (Type) -> Bool,  handler: (() -> Result?)? = nil) -> When<Type, Result> {
+	@discardableResult public func `case`(_ condition: @escaping (Type) -> Bool,  handler: (() -> Result?)? = nil) -> When<Type, Result> {
 		cases.append(handler)
 		conditions.append(ConditionContainer(param:condition))
 		return self
 	}
 	
-	public func `case`(_ condition: @escaping () -> Bool,  handler: (() -> Result?)? = nil) -> When<Type, Result> {
+	@discardableResult public func `case`(_ condition: @escaping () -> Bool,  handler: (() -> Result?)? = nil) -> When<Type, Result> {
 		cases.append(handler)
 		conditions.append(ConditionContainer(noParam:condition))
 		return self
@@ -76,14 +105,27 @@ public extension When where Type == Bool {
 	convenience init() {
 		self.init(true)
 	}
+	
+	convenience init(_ caseProvider: (Case) -> Void) {
+		self.init(true)
+		let provider = Case(owner: self)
+		caseProvider(provider)
+	}
 }
 
 public extension When where Type: Equatable {
-	func `case`(_ condition: Type,  handler: (() -> Result?)? = nil) -> When<Type, Result> {
+	@discardableResult func `case`(_ condition: Type,  handler: (() -> Result?)? = nil) -> When<Type, Result> {
 		cases.append(handler)
 		conditions.append(ConditionContainer(param:{ what in
 			return what == condition
 		}))
+		return self
+	}
+}
+
+public extension When.Case where Type: Equatable {
+	@discardableResult func `case`(_ condition: Type,  handler: (() -> Result?)? = nil) -> When.Case {
+		owner.case(condition, handler: handler)
 		return self
 	}
 }
@@ -139,6 +181,10 @@ public func => <Type>(lhs: Bool, rhs: () -> Type) -> Type? {
 	return lhs ? rhs() : nil
 }
 
+public func => <Type, Result>(lhs: When<Type, Result>.Case, rhs: Result?) -> Void {
+	lhs.add(rhs)
+}
+
 public func =>? <Type>(lhs: Type?, rhs: ()->Type?) -> Type? {
 	if lhs == nil {
 		return rhs()
@@ -151,7 +197,7 @@ public func =>! <Type>(lhs: Type?, rhs: ()->Type) -> Type {
 }
 
 public extension Optional {
-	func takeWhen(_ handler: (Wrapped) -> Bool) -> Wrapped? {
+	@discardableResult func takeWhen(_ handler: (Wrapped) -> Bool) -> Wrapped? {
 		switch(self) {
 		case .some(let value):
 			if handler(value) {
@@ -163,7 +209,7 @@ public extension Optional {
 		return nil
 	}
 	
-	func `let`<Result>(_ handler: (Wrapped) -> Result?) -> Result? {
+	@discardableResult func `let`<Result>(_ handler: (Wrapped) -> Result?) -> Result? {
 		switch(self) {
 		case .some(let value):
 			return handler(value)
@@ -171,7 +217,7 @@ public extension Optional {
 		}
 	}
 	
-	func apply(_ handler: (Wrapped) -> Void) -> Wrapped? {
+	@discardableResult func apply(_ handler: (Wrapped) -> Void) -> Wrapped? {
 		switch(self) {
 		case .some(let value):
 			handler(value)
