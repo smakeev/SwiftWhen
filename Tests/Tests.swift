@@ -436,8 +436,8 @@ class Tests: XCTestCase {
 			$0.case(3 > 5)
 			$0.case({$0 == false})
 			$0.case(6 > 20)
-			$0.case(false) => "No way"
-			$0.case(true) => "true"
+			$0.case(false) {"No way"}
+			$0.case(true) {"true"}
 		}.default(nil) ?? "Default"
 		XCTAssert(d2 == "true")
 	}
@@ -461,6 +461,20 @@ class Tests: XCTestCase {
 		let b1 = When(a) {
 			$0.case(0) => "Zero"
 			$0.case(1) => "One"
+			$0.case(2) => "Two"
+			$0.case(3) => "Three"
+			$0.case(4)
+			$0.case(5) { "Five" }
+			$0.case(6) => "Six"
+			$0.case(7) => "Seven"
+			$0.case(8) => "Eight"
+			$0.case(9) =>  "Nine"
+		}.default(nil) ?? "Unknown"
+		XCTAssert(b1 == "Five")
+		
+		let b2 = When(a) {
+			$0.case(0) => "Zero"
+			$0.case(1) => "One"
 			$0.case(2)
 			.case(3)
 			.case(4)
@@ -470,15 +484,105 @@ class Tests: XCTestCase {
 			$0.case(8) => "Eight"
 			$0.case(9) =>  "Nine"
 		}.default(nil) ?? "Unknown"
-		XCTAssert(b1 == "More than one, less then 6")
+		XCTAssert(b2 == "More than one, less then 6")
 		
 		let d2 = When {
 			$0.case(3 > 5)
 			.case({$0 == false})
 			.case(6 > 20)
-			.case(false) => "No way"
-			$0.case(true) => "true"
+			.case(false) { "No way" }
+			$0.case(true) {"true"}
 		}.default(nil) ?? "Default"
 		XCTAssert(d2 == "true")
+	}
+	
+	func test3dSyntax() {
+	
+		let d = When(.simple) {
+			$0(3 > 5) => "1"
+			$0(6 > 20) => "2"
+			$0(false) => "3"
+			$0(true) => "true"
+		}.default(nil) ?? "Default"
+		XCTAssert(d == "true")
+	
+		let a = 5
+		let b = When(.simple, a) {
+			$0(0) => "Zero"
+			$0(1) => "One"
+			$0(2) => "Two"
+			$0(3) => "Three"
+			$0(4) => "Four"
+			$0(5) => "Five"
+			$0(6) => "Six"
+			$0(7) => "Seven"
+			$0(8) => "Eight"
+			$0(9) =>  "Nine"
+		}.default(nil) ?? "Unknown"
+		XCTAssert(b == "Five")
+		
+		let a1 = 2
+		let b1 = When(.simple, a1) {
+			$0(0) => "Zero"
+			$0(1) => "One"
+			$0(2) => .skip
+			$0(3) => .skip
+			$0(4) => .skip
+			$0(5) => "Five"
+			$0(6) => "Six"
+			$0(7) => "Seven"
+			$0(8) => "Eight"
+			$0(9) =>  "Nine"
+		}.default(nil) ?? "Unknown"
+		XCTAssert(b1 == "Five")
+		
+		let n1 = 5
+		let r1 = When(.simple, n1) {
+			$0(0) => "Zero"
+			$0(1) => "One"
+			$0(2) => "Two"
+			$0(3) => "Three"
+			$0(4) => "Four"
+			$0(5) => nil
+			$0(6) => "Six"
+			$0(7) => "Seven"
+			$0(8) => "Eight"
+			$0(9) =>  "Nine"
+		}.default("dd")
+		XCTAssert(r1 == nil)
+		
+		let n2 = 5
+		let r2 = When(.simple, n2) {
+			$0(0) => "Zero"
+			$0(1) => "One"
+			$0(2) => "Two"
+			$0(3) => "Three"
+			$0(4) => "Four"
+			$0(5) => {
+				return "Five"
+			}()
+			$0(6) => "Six"
+			$0(7) => "Seven"
+			$0(8) => "Eight"
+			$0(9) =>  "Nine"
+		}.default("dd")
+		XCTAssert(r2 == "Five")
+		
+		let n3 = 5
+		let r3 = When(.simple, n3) {
+			$0(0) => "Zero"
+			$0(1) => "One"
+			$0(2) => "Two"
+			$0(3) => "Three"
+			$0({true}) => "Four"
+			$0({$0 == 5}) => {
+				return "Five"
+			}()
+			$0(6) => "Six"
+			$0(7) => "Seven"
+			$0(8) => "Eight"
+			$0(9) =>  "Nine"
+		}.default("dd")
+		XCTAssert(r3 == "Five")
 	}
 }

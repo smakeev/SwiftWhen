@@ -6,6 +6,13 @@
 //  Copyright © 2019 SOME projects. All rights reserved.
 //
 
+public enum WhenOptions{
+	case simple
+}
+
+public enum WhenCaseOptions {
+	case skip
+}
 
 open class When<Type, Result> {
 
@@ -50,7 +57,7 @@ open class When<Type, Result> {
 		let provider = Case(owner: self)
 		caseProvider(provider)
 	}
-	
+
 	public init(_ what: Type) {
 		self.what  = what
 		cases      = [(()->Result?)?]()
@@ -111,6 +118,10 @@ public extension When where Type == Bool {
 		let provider = Case(owner: self)
 		caseProvider(provider)
 	}
+	convenience init(_ simple: WhenOptions, _ caseProvider: ((Any)->Case) -> Void) {
+		self.init(true)
+		caseProvider(caseReturner())
+	}
 }
 
 public extension When where Type: Equatable {
@@ -120,6 +131,29 @@ public extension When where Type: Equatable {
 			return what == condition
 		}))
 		return self
+	}
+
+	 convenience init(_ simple: WhenOptions,_ what: Type, caseProvider: ((Any)->Case) -> Void) {
+		self.init(what)
+		caseProvider(caseReturner())
+	}
+								//(Type) -> Bool
+	 func caseReturner() -> (Any) -> Case {
+		
+		return { value in
+			let provider = Case(owner: self)
+			//caseProvider(provider)
+			
+			if let handler = value as? (Type) -> Bool {
+				provider.case(handler)
+			} else if let validValue = value as? Type {
+					provider.case(validValue )
+			} else {
+				provider.case({false})
+			}
+			
+			return provider
+		}
 	}
 }
 
@@ -183,6 +217,14 @@ public func => <Type>(lhs: Bool, rhs: () -> Type) -> Type? {
 
 public func => <Type, Result>(lhs: When<Type, Result>.Case, rhs: Result?) -> Void {
 	lhs.add(rhs)
+}
+
+public func => <Type, Result>(lhs: When<Type, Result>.Case, rhs: WhenCaseOptions) -> Void {
+	switch (rhs) {
+	case .skip:
+			//do nothing
+			break
+	}
 }
 
 public func =>? <Type>(lhs: Type?, rhs: ()->Type?) -> Type? {
