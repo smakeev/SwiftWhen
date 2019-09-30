@@ -619,4 +619,111 @@ class Tests: XCTestCase {
 		}.default("dd")
 		XCTAssert(r5 == "Five")
 	}
+	
+	func testComplex() {
+		let testState = TestState.idle
+		
+		let stateInt = When(testState)
+				.case(.idle)      { 0 }
+				.case(.preparing) { nil }
+				.case(.ready)     { 2 }
+				.case(.working)   { 3 }
+				.case(.pausing)   { 4 }
+				.case(.finished)  { 5 }
+				.case(.wrong) 	  { 6 }
+				.default(nil) ?? 0
+		
+		XCTAssert(stateInt == 0)
+
+		let stateInt1 = When<TestState, Int>(testState)
+				.case({ $0 == .idle })      { 0 }
+				.case({ $0 == .preparing }) { nil }
+				.case({ $0 == .ready })     { 2 }
+				.case({ $0 == .working })   { 3 }
+				.case({ $0 == .pausing })   { 4 }
+				.case({ $0 == .finished })  { 5 }
+				.case({ $0 == .wrong })     { 6 }
+				.default(nil) ?? 0
+		
+		XCTAssert(stateInt1 == 0)
+
+		let stateInt2 = When(testState) {
+				$0.case(.idle)      { 0 }
+				$0.case(.preparing) { nil }
+				$0.case(.ready)     { 2 }
+				$0.case(.working)   { 3 }
+				$0.case(.pausing)   { 4 }
+				$0.case(.finished)  { 5 }
+				$0.case(.wrong)     { 6 }
+				}
+				.default(nil) ?? 0
+		
+		XCTAssert(stateInt2 == 0)
+
+		let stateInt3 = When(testState) {
+				$0.case(.idle)      => { 0 }()
+				$0.case(.preparing) => { nil }()
+				$0.case(.ready)     => { 2 }()
+				$0.case(.working)   => { 3 }()
+				$0.case(.pausing)   => { 4 }()
+				$0.case(.finished)  => { 5 }()
+				$0.case(.wrong)     => { 6 }()
+				}
+				.default(nil) ?? 0
+		
+		XCTAssert(stateInt3 == 0)
+
+		let stateInt4 = When(testState) {
+				$0.case(.idle)      => 0
+				$0.case(.preparing) => nil
+				$0.case(.ready)     => 2
+				$0.case(.working)   => 3
+				$0.case(.pausing)   => 4
+				$0.case(.finished)  => 5
+				$0.case(.wrong)     => 6
+				}
+				.default(nil) ?? 0
+		
+		XCTAssert(stateInt4 == 0)
+
+		let stateInt5 = When(testState) {
+				$0.case({ $0 == .idle })      => 0
+				$0.case({ $0 == .preparing }) => nil
+				$0.case({ $0 == .ready })     => 2
+				$0.case({ $0 == .working })   => 3
+				$0.case({ $0 == .pausing })   => 4
+				$0.case({ $0 == .finished })  => 5
+				$0.case({ $0 == .wrong })     => 6
+				}
+				.default(nil) ?? 0
+		
+		XCTAssert(stateInt5 == 0)
+
+
+		let stateInt6 = When(.simple, testState) {
+				$0(TestState.idle)      => 0
+				$0(TestState.preparing) => nil
+				$0(TestState.ready)     => 2
+				$0(TestState.working)   => 3
+				$0(TestState.pausing)   => 4
+				$0(TestState.finished)  => 5
+				$0(TestState.wrong)     => 6
+				}
+				.default(nil) ?? 0
+
+		XCTAssert(stateInt6 == 0)
+		
+		let stateInt7 = When(.simple, testState) {
+				$0({ $0 == TestState.idle })      => 0
+				$0({ $0 == TestState.preparing }) => nil
+				$0({ $0 == TestState.ready })     => 2
+				$0({ $0 == TestState.working })   => 3
+				$0({ $0 == TestState.pausing })   => 4
+				$0({ $0 == TestState.finished })  => 5
+				$0({ $0 == TestState.wrong })     => 6
+				}
+				.default(nil) ?? 0
+
+		XCTAssert(stateInt7 == 0)
+	}
 }
