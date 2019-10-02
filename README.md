@@ -274,7 +274,7 @@ By adding ```.simple``` you could just provide cases in ```$0``` statement and p
 In case of several cases have the same result you may just ommit ```=>``` for cases besides the last one.
 But in this case the compiler will show a warning.
 To remove the warning you could use ```.skip```
-###Note: ```.simple``` case is only applicable when you provide a simple result.
+## Note: ```.simple``` case is only applicable when you provide a simple result.
 In case of you need to call a function this is a bad idea due to all of them will be called.
 
 ```swift
