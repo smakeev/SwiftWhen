@@ -2,84 +2,6 @@
 
 ```When``` is similar to ```switch``` but could be used as an expression. 
 
-# What's new in 2.0.0
-
-New 2 variants of syntax available:
-Symple: 
-```swift
-		let source = 5
-		let result = When(.simple, source) {
-			$0(0) => "Zero"
-			$0(1) => "One"
-			$0(2) => "Two"
-			$0(3) => "Three"
-			$0(false) => "Four"
-			$0(true) => {
-				return "Five"
-			}()
-			$0(6) => "Six"
-			$0(7) => "Seven"
-			$0(8) => "Eight"
-			$0(9) =>  "Nine"
-		}.default("default")
-```
-By adding ```.simple``` you could just provide cases in ```$0``` statement and provide according value after ```=>```
-In case of several cases have the same result you may just ommit ```=>``` for cases besides the last one.
-But in this case the compiler will show a warning.
-To remove the warning you could use ```.skip```
-```swift
-		let a1 = 2
-		let b1 = When(.simple, a1) {
-			$0(0) => "Zero"
-			$0(1) => "One"
-			$0(2) => .skip
-			$0(3) => .skip
-			$0(4) => .skip
-			$0(5) => "Five"
-			$0(6) => "Six"
-			$0(7) => "Seven"
-			$0(8) => "Eight"
-			$0(9) =>  "Nine"
-		}.default(nil) ?? "Unknown"
-```
-
-THe second variant of new syntax does not contain ```simple``` key word
-```swift
-		let b1 = When(a) {
-			$0.case(0) => "Zero"
-			$0.case(1) => "One"
-			$0.case(2) => "Two"
-			$0.case(3) => "Three"
-			$0.case(4)
-			$0.case(5) { "Five" }
-			$0.case(6) => "Six"
-			$0.case(7) => "Seven"
-			$0.case(8) => "Eight"
-			$0.case(9) =>  "Nine"
-		}.default(nil) ?? "Unknown"
-```
-In this variant you may also use ```=>``` to provide simple result. Also you could provide closures directly. As in case(5) here.
-
-Also both variants of syntax supports ```When``` without an argument
-```swift
-		let result = When {
-			$0.case(3 > 5)
-			.case({$0 == false})
-			.case(6 > 20)
-			.case(false) { "No way" }
-			$0.case(true) {"true"}
-		}.default(nil) ?? "Default"
-```
-```swift
-		let result = When(.simple) {
-			$0(3 > 5) => "1"
-			$0(6 > 20) => "2"
-			$0(false) => "3"
-			$0(true) => "true"
-		}.default(nil) ?? "Default"
-```
-
-Old syntax also supported. And it could be combined with new.
 ```swift
 let a = When(number)
         .case(0) {"Invalid number"}
@@ -326,3 +248,85 @@ Note, you will need add
 ```swift 
 import SomeWhen
 ```
+
+# What's new in 2.0.0
+
+New 2 variants of syntax available:
+Symple: 
+```swift
+		let source = 5
+		let result = When(.simple, source) {
+			$0(0) => "Zero"
+			$0(1) => "One"
+			$0(2) => "Two"
+			$0(3) => "Three"
+			$0(false) => "Four"
+			$0(true) => {
+				return "Five"
+			}()
+			$0(6) => "Six"
+			$0(7) => "Seven"
+			$0(8) => "Eight"
+			$0(9) =>  "Nine"
+		}.default("default")
+```
+By adding ```.simple``` you could just provide cases in ```$0``` statement and provide according value after ```=>```
+In case of several cases have the same result you may just ommit ```=>``` for cases besides the last one.
+But in this case the compiler will show a warning.
+To remove the warning you could use ```.skip```
+###Note: ```.simple``` case is only applicable when you provide a simple result.
+In case of you need to call a function this is a bad idea due to all of them will be called.
+
+```swift
+		let a1 = 2
+		let b1 = When(.simple, a1) {
+			$0(0) => "Zero"
+			$0(1) => "One"
+			$0(2) => .skip
+			$0(3) => .skip
+			$0(4) => .skip
+			$0(5) => "Five"
+			$0(6) => "Six"
+			$0(7) => "Seven"
+			$0(8) => "Eight"
+			$0(9) =>  "Nine"
+		}.default(nil) ?? "Unknown"
+```
+
+The second variant of new syntax does not contain ```simple``` key word
+```swift
+		let b1 = When(a) {
+			$0.case(0) => "Zero"
+			$0.case(1) => "One"
+			$0.case(2) => "Two"
+			$0.case(3) => "Three"
+			$0.case(4)
+			$0.case(5) { "Five" }
+			$0.case(6) => "Six"
+			$0.case(7) => "Seven"
+			$0.case(8) => "Eight"
+			$0.case(9) =>  "Nine"
+		}.default(nil) ?? "Unknown"
+```
+In this variant you may also use ```=>``` to provide simple result. Also you could provide closures directly. As in case(5) here.
+
+Also both variants of syntax supports ```When``` without an argument
+```swift
+		let result = When {
+			$0.case(3 > 5)
+			.case({$0 == false})
+			.case(6 > 20)
+			.case(false) { "No way" }
+			$0.case(true) {"true"}
+		}.default(nil) ?? "Default"
+```
+```swift
+		let result = When(.simple) {
+			$0(3 > 5) => "1"
+			$0(6 > 20) => "2"
+			$0(false) => "3"
+			$0(true) => "true"
+		}.default(nil) ?? "Default"
+```
+
+Old syntax also supported. And it could be combined with new.
