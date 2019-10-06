@@ -330,3 +330,63 @@ Also both variants of syntax supports ```When``` without an argument
 ```
 
 Old syntax also supported. And it could be combined with new.
+
+### in 2.0.1 you can also use closure after =>. Closure will be called only in case of ```case``` is correct.
+Here are examples:
+```swift
+		let testState = TestState.idle
+
+		let stateInt = When(.simple, testState) {
+				$0(TestState.idle)      => { 0 }
+				$0(TestState.preparing) => { nil }
+				$0(TestState.ready)     => { 2 }
+				$0(TestState.working)   => { 3 }
+				$0(TestState.pausing)   => { 4 }
+				$0(TestState.finished)  => { 5 }
+				$0(TestState.wrong)     => { 6 }
+				}
+				.default(nil) ?? 0
+
+		XCTAssert(stateInt == 0)
+		
+		let stateInt1 = When(testState) {
+				$0.case(TestState.idle)      => { 0 }
+				$0.case(TestState.preparing) => { nil }
+				$0.case(TestState.ready)     => { 2 }
+				$0.case(TestState.working)   => { 3 }
+				$0.case(TestState.pausing)   => { 4 }
+				$0.case(TestState.finished)  => { 5 }
+				$0.case(TestState.wrong)     => { 6 }
+				}
+				.default(nil) ?? 0
+
+		XCTAssert(stateInt1 == 0)
+
+		let stateInt2 = When(.simple) {
+				$0({testState == TestState.idle})      => { 0 }
+				$0({testState == TestState.preparing}) => { nil }
+				$0({testState == TestState.ready})     => { 2 }
+				$0({testState == TestState.working})   => { 3 }
+				$0({testState == TestState.pausing})   => { 4 }
+				$0({testState == TestState.finished})  => { 5 }
+				$0({testState == TestState.wrong})     => { 6 }
+				}
+				.default(nil) ?? 0
+
+		XCTAssert(stateInt2 == 0)
+		
+		let stateInt3 = When {
+				$0.case({testState == TestState.idle})      => { 0 }
+				$0.case({testState == TestState.preparing}) => { nil }
+				$0.case({testState == TestState.ready})     => { 2 }
+				$0.case({testState == TestState.working})   => { 3 }
+				$0.case({testState == TestState.pausing})   => { 4 }
+				$0.case({testState == TestState.finished})  => { 5 }
+				$0.case({testState == TestState.wrong})     => { 6 }
+				}
+				.default(nil) ?? 0
+
+		XCTAssert(stateInt3 == 0)
+
+```
+
