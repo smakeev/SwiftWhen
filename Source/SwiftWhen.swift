@@ -35,6 +35,11 @@ open class When<Type, Result> {
 			owner.cases.remove(at: owner.cases.count - 1)
 			owner.cases.append({result})
 		}
+		
+		fileprivate func addClosure(_ closure: @escaping () -> Result?) {
+			owner.cases.remove(at: owner.cases.count - 1)
+			owner.cases.append(closure)
+		}
 	}
 
 	struct ConditionContainer {
@@ -230,6 +235,10 @@ public func => <Type, Result>(lhs: When<Type, Result>.Case, rhs: WhenCaseOptions
 			//do nothing
 			break
 	}
+}
+
+public func => <Type, Result>(lhs: When<Type, Result>.Case, rhs: @escaping () -> Result?) -> Void {
+	lhs.addClosure(rhs)
 }
 
 public func =>? <Type>(lhs: Type?, rhs: ()->Type?) -> Type? {
