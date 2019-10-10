@@ -784,6 +784,18 @@ class Tests: XCTestCase {
 		XCTAssert(stateInt3 == 0)
 	}
 
+    class SubClass {
+
+    }
+
+    class TestOpEqQu {
+        var a: SubClass?
+
+        func setA(_ newA: SubClass?) {
+            a =? newA
+        }
+    }
+
     func testEqQuWithOptional() { //fix in 2.0.2
         var a: Int? = nil
         let b: Int? = 3
@@ -791,5 +803,14 @@ class Tests: XCTestCase {
         XCTAssert(a == 3)
         a =? nil
         XCTAssert(a == 3)
+
+        let tester = TestOpEqQu()
+        XCTAssert(tester.a == nil)
+        tester.a =? SubClass()
+        XCTAssert(tester.a != nil)
+        tester.a =? nil
+        XCTAssert(tester.a != nil)
+        tester.setA(nil)
+        XCTAssert(tester.a != nil)  // here was a problem
     }
 }
