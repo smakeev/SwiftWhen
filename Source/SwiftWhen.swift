@@ -212,6 +212,13 @@ public func =? <Type>(lhs: inout Type, rhs: Type?) -> Void {
 	lhs = rhs ?? lhs
 }
 
+public func =? <Type>(lhs: inout Type?, rhs: Type?) -> Void {
+	if rhs == nil {
+		return
+	}
+	lhs = rhs!
+}
+
 public func => (lhs: Bool, rhs: Bool) -> Bool {
 	let result = When<(Bool, Bool), Bool>((lhs, rhs))
 		.case({$0.0 && $0.1})

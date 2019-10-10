@@ -782,7 +782,14 @@ class Tests: XCTestCase {
 				.default(nil) ?? 0
 
 		XCTAssert(stateInt3 == 0)
-
-
 	}
+
+    func testEqQuWithOptional() { //fix in 2.0.2
+        var a: Int? = nil
+        let b: Int? = 3
+        a =? b
+        XCTAssert(a == 3)
+        a =? nil
+        XCTAssert(a == 3)
+    }
 }
