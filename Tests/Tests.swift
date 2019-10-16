@@ -269,7 +269,7 @@ class Tests: XCTestCase {
 		let z = 3
 		let result = When()
 		.case({ z == 1}) { 1 }
-		.case({ 100.2 == 100.3}) { 2 }
+		.case({ Double(100.2) == Double(100.3)}) { 2 }
 		.case({ z == 3}) { 3 }
 		.case({"str" == "str"}) { -100 }
 		.default(nil) ?? 0
