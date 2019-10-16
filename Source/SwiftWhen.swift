@@ -84,7 +84,19 @@ open class When<Type, Result> {
 		return self
 	}
 	
+	public func `else`(_ defaultValue: Result?) -> Result? {
+		return `default`({defaultValue})
+	}
+	
+	public func `else`(_ defaultBlock: () -> Result?) -> Result? {
+		return `default`(defaultBlock)
+	}
+	
 	public func `default`(_ defaultValue: Result?) -> Result? {
+		return `default`({defaultValue})
+	}
+	
+	public func `default`(_ defaultBlock: () -> Result?) -> Result? {
 		var currentCase: (()->Result?)? = nil
 		for index in 0..<conditions.count {
 			var result: Bool = false
@@ -109,7 +121,7 @@ open class When<Type, Result> {
 		if let validCase = currentCase {
 			return validCase()
 		}
-		return defaultValue
+		return defaultBlock()
 	}
 }
 

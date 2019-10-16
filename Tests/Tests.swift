@@ -813,4 +813,33 @@ class Tests: XCTestCase {
         tester.setA(nil)
         XCTAssert(tester.a != nil)  // here was a problem
     }
+    
+    func testNewDefaultWithBlock() {
+		let a: Int = 5
+		
+		let b = When(a)
+			.case(0) {"0"}
+			.case(1) {"1"}
+			.default {
+				if a < 5 {
+					return "less then 5"
+				} else {
+					return " >= 5"
+				}
+			}
+		XCTAssert(b == " >= 5")
+		
+		let c =  When<Int, String>(a) {
+				   $0.case(0) => "0"
+				   $0.case(1) => "1"
+				}
+				.else {
+					   if a < 5 {
+						   return "less then 5"
+					   } else {
+						   return " >= 5"
+					   }
+				   }
+			   XCTAssert(c == " >= 5")
+	}
 }
