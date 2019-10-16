@@ -389,4 +389,36 @@ Here are examples:
 		XCTAssert(stateInt3 == 0)
 
 ```
+### in 2.0.2 you can use closure in default. Closure will be executed only if no cases worked.
+### Also now you can use `.else` instead of `.default`
+
+```swift
+			let a: Int = 5
+		
+		let b = When(a)
+			.case(0) {"0"}
+			.case(1) {"1"}
+			.default {
+				if a < 5 {
+					return "less then 5"
+				} else {
+					return " >= 5"
+				}
+			}
+		XCTAssert(b == " >= 5")
+		
+		let c =  When<Int, String>(a) {
+				   $0.case(0) => "0"
+				   $0.case(1) => "1"
+				}
+				.else {
+					   if a < 5 {
+						   return "less then 5"
+					   } else {
+						   return " >= 5"
+					   }
+				   }
+		XCTAssert(c == " >= 5")
+```
+
 
