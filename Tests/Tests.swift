@@ -840,6 +840,6 @@ class Tests: XCTestCase {
 						   return " >= 5"
 					   }
 				   }
-			   XCTAssert(c == " >= 5")
+		XCTAssert(c == " >= 5")
 	}
 }
