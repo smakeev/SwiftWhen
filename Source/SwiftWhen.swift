@@ -200,10 +200,6 @@ public func with<Type>(_ source: Type?, handler: (Type) -> Void) {
 	}
 }
 
-public func with<Type>(_ source: Type, handler: (Type) -> Void) {
-	handler(source)
-}
-
 precedencegroup LogicalFollowng {
 	lowerThan: LogicalDisjunctionPrecedence
 	higherThan: OptionalLogicalFollowng
