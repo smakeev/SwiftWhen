@@ -194,6 +194,12 @@ public func when<Type, ResultType> (_ source: Type?, handler: (Type) -> ResultTy
 	return nil
 }
 
+public func with<Type>(_ source: Type?, handler: (Type) -> Void) {
+	if let valiSource = source {
+		handler(valiSource)
+	}
+}
+
 public func with<Type>(_ source: Type, handler: (Type) -> Void) {
 	handler(source)
 }
