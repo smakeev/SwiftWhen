@@ -14,7 +14,87 @@ public enum WhenCaseOptions {
 	case skip
 }
 
+#if swift(>=5.1.0)
+
+public 	func => <Type, Result> (lhs: @escaping (Type) -> Bool , rhs: Result?) -> When<Type, Result>.OneCase  where Type: Equatable  {
+	return When<Type, Result>.OneCase(condition1: lhs, handler: { rhs } )
+}
+
+public 	func => <Type, Result> (lhs: @escaping () -> Bool , rhs: Result?) -> When<Type, Result>.OneCase  where Type: Equatable  {
+	return When<Type, Result>.OneCase(condition2: lhs, handler: { rhs })
+}
+
+public 	func => <Type, Result> (lhs: @escaping (Type) -> Bool , rhs: @escaping () -> Result?) -> When<Type, Result>.OneCase  where Type: Equatable  {
+	return When<Type, Result>.OneCase(condition1: lhs, handler: rhs)
+}
+
+public 	func => <Type, Result> (lhs: @escaping () -> Bool , rhs: @escaping () -> Result?) -> When<Type, Result>.OneCase  where Type: Equatable  {
+	return When<Type, Result>.OneCase(condition2: lhs, handler: rhs)
+}
+
+public 	func => <Type, Result> (lhs: Type , rhs: Result?) -> When<Type, Result>.OneCase where Type: Equatable {
+	return When<Type, Result>.OneCase(caseToCompare: lhs , handler: { rhs })
+}
+
+public 	func => <Type, Result> (lhs: Type , rhs: @escaping () -> Result?) -> When<Type, Result>.OneCase where Type: Equatable {
+	return When<Type, Result>.OneCase(caseToCompare: lhs , handler: rhs)
+}
+
+public 	func => <Type, Result> (lhs: @escaping (Type) -> Bool , rhs: WhenCaseOptions) -> When<Type, Result>.OneCase  where Type: Equatable  {
+	return When<Type, Result>.OneCase(condition1: lhs)
+}
+
+public 	func => <Type, Result> (lhs: @escaping () -> Bool , rhs: WhenCaseOptions) -> When<Type, Result>.OneCase  where Type: Equatable  {
+	return When<Type, Result>.OneCase(condition2: lhs)
+}
+
+public 	func => <Type, Result> (lhs: Type , rhs: WhenCaseOptions) -> When<Type, Result>.OneCase where Type: Equatable {
+	return When<Type, Result>.OneCase(caseToCompare: lhs)
+}
+
+#endif
+
 open class When<Type, Result> {
+
+#if swift(>=5.1.0)
+	public struct OneCase {
+		var condition1:    ((Type) -> Bool)?
+		var condition2:    (() -> Bool)?
+		var caseToCompare: Type?
+		var handler:       (() -> Result?)?
+		
+		init(caseToCompare: Type, handler: (() -> Result?)? = nil) {
+			self.caseToCompare = caseToCompare
+			self.handler       = handler
+		}
+		
+		init(condition1: @escaping (Type) -> Bool, handler: (() -> Result?)? = nil) {
+			self.condition1 = condition1
+			self.handler    = handler
+		}
+		
+		init(condition2: @escaping () -> Bool, handler: (() -> Result?)? = nil) {
+			self.condition2 = condition2
+			self.handler    = handler
+		}
+	}
+	
+	public struct Cases {
+		var cases: [OneCase] = [OneCase]()
+	}
+	
+	@_functionBuilder
+	public struct WhenBuilder {
+		static func buildBlock(_ cases: OneCase...) -> Cases {
+			var all_cases = Cases()
+			for element in cases {
+				all_cases.cases.append(element)
+			}
+			return all_cases
+		}
+	}
+	
+#endif
 
 	public class Case {
 		var owner: When
@@ -142,6 +222,40 @@ public extension When where Type == Bool {
 }
 
 public extension When where Type: Equatable {
+	
+#if swift(>=5.1.0)
+	private func applyIfComparable(_ case: Type, handler: (() -> Result?)?) -> Bool {
+		self.case(`case`, handler: handler)
+		return true
+	}
+
+	func cases(@WhenBuilder block: () -> Cases) -> When<Type, Result> {
+		let cases = block()
+		self.applyCases(cases)
+		return self
+	}
+
+	private func applyCase(_ case: OneCase) {
+		if let validCondition1 = `case`.condition1 {
+			self.case(validCondition1, handler: `case`.handler)
+		} else if let validCondition2 = `case`.condition2 {
+			self.case(validCondition2, handler: `case`.handler)
+		}	else if let validCase = `case`.caseToCompare {
+			if !applyIfComparable(validCase, handler: `case`.handler) {
+				fatalError("When case can'not be used, check OneCase parameters")
+			}
+		} else {
+			fatalError("When case can'not be used, check OneCase parameters")
+		}
+	}
+	
+	private func applyCases(_ cases: Cases) {
+		for oneCase in cases.cases {
+			self.applyCase(oneCase)
+		}
+	}
+#endif
+
 	@discardableResult func `case`(_ condition: Type,  handler: (() -> Result?)? = nil) -> When<Type, Result> {
 		cases.append(handler)
 		conditions.append(ConditionContainer(param:{ what in
@@ -154,7 +268,7 @@ public extension When where Type: Equatable {
 		self.init(what)
 		caseProvider(caseReturner())
 	}
-								//(Type) -> Bool
+							//(Type) -> Bool
 	 func caseReturner() -> (Any) -> Case {
 		
 		return { value in

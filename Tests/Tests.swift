@@ -890,4 +890,40 @@ class Tests: XCTestCase {
 		}
 		XCTAssert(c == " >= 5")
 	}
+	
+	#if swift(>=5.1.0)
+	
+	func doTesting(_ test: Int) -> String? {
+		return When<Int, String>(test).cases {
+			{$0 == 1} => "1"
+			{$0 == 2} => "2"
+			{3 == 4}  => "Strange"
+			3        => "3"
+			4        => "4"
+			5        => .skip
+			6        => .skip
+			7        => ">=5"
+	}.default("0")
+
+	}
+	
+	func testOperatorAfterCase() {
+		let a: Int  = 1
+		let a1: Int = 2
+		let a2: Int = 3
+		let a3: Int = 4
+		let a4: Int = 5
+		let a5: Int = 6
+		let a6: Int = 7
+		let a7: Int = 8
+		XCTAssert(doTesting(a) == "1")
+		XCTAssert(doTesting(a1) == "2")
+		XCTAssert(doTesting(a2) == "3")
+		XCTAssert(doTesting(a3) == "4")
+		XCTAssert(doTesting(a4) == ">=5")
+		XCTAssert(doTesting(a5) == ">=5")
+		XCTAssert(doTesting(a6) == ">=5")
+		XCTAssert(doTesting(a7) == "0")
+	}
+	#endif
 }
