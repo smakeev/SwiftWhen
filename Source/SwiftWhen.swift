@@ -385,6 +385,32 @@ public func => <Type, Result> (lhs: UnionCases<Type>, rhs: Result) -> When<Type,
 	return oneCase
 }
 
+public func => <Type, Result> (lhs: [Type], rhs: @escaping () -> Result) -> When<Type, Result>.OneCase where Type: Equatable {
+	let oneCase = When<Type, Result>.OneCase(condition1: { what in
+		for item in lhs {
+			if what == item {
+				return true
+			}
+		}
+		return false
+	}, handler: rhs)
+	
+	return oneCase
+}
+
+public func => <Type, Result> (lhs: UnionCases<Type>, rhs: @escaping () -> Result) -> When<Type, Result>.OneCase where Type: Equatable {
+	let oneCase = When<Type, Result>.OneCase(condition1: { what in
+		for item in lhs.cases {
+			if what == item {
+				return true
+			}
+		}
+		return false
+	}, handler: rhs)
+	
+	return oneCase
+}
+
 #endif
 
 public extension When where Type: Equatable {

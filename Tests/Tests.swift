@@ -958,8 +958,8 @@ class Tests: XCTestCase {
 		let a1: Int  = 5
 		let b1 = When(a1).cases {
 			1 => "one"
-			cases(2, 3, 4, 5, 6, 7, 8) => "2 - 8"
-			100 => "100"
+			cases(2, 3, 4, 5, 6, 7, 8) => {"2 - 8"}
+			100 => {"100"}
 		}.else("100")
 		XCTAssert(b1 == "2 - 8")
 
