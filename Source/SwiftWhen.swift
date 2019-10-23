@@ -14,6 +14,10 @@ public enum WhenCaseOptions {
 	case skip
 }
 
+public struct DefaultPresenter<Type, Result> {
+	fileprivate var when: When<Type, Result>!
+}
+
 #if swift(>=5.1.0)
 
 public 	func => <Type, Result> (lhs: @escaping (Type) -> Bool , rhs: Result?) -> When<Type, Result>.OneCase  where Type: Equatable  {
@@ -192,7 +196,47 @@ open class When<Type, Result> {
 		return `default`({defaultValue})
 	}
 	
-	public func `default`(_ defaultBlock: () -> Result?) -> Result? {
+	public func unwrappedDefault(_ defaultBlock: () -> Result) -> Result {
+		let result   = `default`({nil})
+		if let validResult = result {
+			return validResult
+		} else {
+			return defaultBlock()
+		}
+	}
+	
+	public func unwrappedDefault(_ defaultValue: Result) -> Result {
+		return unwrappedDefault({defaultValue})
+	}
+	
+	public func unwrappedElse(_ defaultValue: Result) -> Result {
+		return unwrappedDefault({defaultValue})
+	}
+	
+	public func unwrappedElse(_ defaultBlock: () -> Result) -> Result {
+		return unwrappedDefault(defaultBlock)
+	}
+	
+	public func nonNilDefault(_ defaultBlock: () -> Result) -> Result {
+		let result = subDefault()
+		guard let validCase = result else { return defaultBlock() }
+		guard let validResult = validCase() else { fatalError("unexpectedly found nil") }
+		return validResult
+	}
+
+	public func nonNilDefault(_ defaultValue: Result) -> Result {
+		return nonNilDefault({defaultValue})
+	}
+
+	public func nonNilElse(_ defaultValue: Result) -> Result {
+		return nonNilDefault({defaultValue})
+	}
+
+	public func nonNilElse(_ defaultBlock: () -> Result) -> Result {
+		return nonNilDefault(defaultBlock)
+	}
+	
+	fileprivate func subDefault() -> (()->Result?)? {
 		var currentCase: (()->Result?)? = nil
 		for index in 0..<conditions.count {
 			var result: Bool = false
@@ -210,14 +254,25 @@ open class When<Type, Result> {
 					}
 					currentIndex += 1
 				}
-				
 				break
 			}
 		}
-		if let validCase = currentCase {
+		return currentCase
+	}
+	
+	public func `default`(_ defaultBlock: () -> Result?) -> Result? {
+		if let validCase = subDefault() {
 			return validCase()
 		}
 		return defaultBlock()
+	}
+	
+	public var `default`: DefaultPresenter<Type, Result> {
+		return DefaultPresenter<Type, Result>(when: self)
+	}
+	
+	public var `else`: DefaultPresenter<Type, Result> {
+		return DefaultPresenter<Type, Result>(when: self)
 	}
 }
 
@@ -236,6 +291,57 @@ public extension When where Type == Bool {
 		caseProvider(caseReturner())
 	}
 }
+
+
+
+public func => <Type, Result> (lhs: DefaultPresenter<Type, Result>, rhs: Result?) -> Result? {
+	return lhs.when.default(rhs)
+}
+
+public func => <Type, Result> (lhs: DefaultPresenter<Type, Result>, rhs: () -> Result?) -> Result? {
+	return lhs.when.default(rhs)
+}
+
+public func => <Type, Result> (lhs: When<Type, Result>, rhs: Result?) -> Result? {
+	return lhs.default(rhs)
+}
+
+public func => <Type, Result> (lhs: When<Type, Result>, rhs: () -> Result?) -> Result? {
+	return lhs.default(rhs)
+}
+
+public func =>? <Type, Result> (lhs: DefaultPresenter<Type, Result>, rhs: Result) -> Result {
+	return lhs.when.unwrappedDefault(rhs)
+}
+
+public func =>? <Type, Result> (lhs: DefaultPresenter<Type, Result>, rhs: () -> Result) -> Result {
+	return lhs.when.unwrappedDefault(rhs)
+}
+
+public func =>? <Type, Result> (lhs: When<Type, Result>, rhs: Result) -> Result {
+	return lhs.unwrappedDefault(rhs)
+}
+
+public func =>? <Type, Result> (lhs: When<Type, Result>, rhs: () -> Result) -> Result {
+	return lhs.unwrappedDefault(rhs)
+}
+
+public func =>! <Type, Result> (lhs: DefaultPresenter<Type, Result>, rhs: Result) -> Result {
+	return lhs.when.nonNilDefault(rhs)
+}
+
+public func =>! <Type, Result> (lhs: DefaultPresenter<Type, Result>, rhs: () -> Result) -> Result {
+	return lhs.when.nonNilDefault(rhs)
+}
+
+public func =>! <Type, Result> (lhs: When<Type, Result>, rhs: Result) -> Result {
+	return lhs.nonNilDefault(rhs)
+}
+
+public func =>! <Type, Result> (lhs: When<Type, Result>, rhs: () -> Result) -> Result {
+	return lhs.nonNilDefault(rhs)
+}
+
 
 #if swift(>=5.1.0)
 

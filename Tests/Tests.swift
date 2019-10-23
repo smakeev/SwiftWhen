@@ -1001,5 +1001,124 @@ class Tests: XCTestCase {
 		}.else("100")
 		XCTAssert(b3 == "Success")
 	}
+	
+	func testDefaultByOperators() {
+		let a1: Int  = 500
+		let b1 = When(a1).cases {
+			1 => "one"
+			[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+			100 => "100"
+		}.else => "500"
+		XCTAssert(b1 == "500")
+	
+		
+		var nonOptional: String!
+		nonOptional = When(a1).cases {
+			1 => nil
+			[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+			100 => "100"
+		}.else =>! "500"
+		XCTAssert(nonOptional == "500")
+
+		nonOptional = When(a1).cases {
+			1 => nil
+			[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+			500 => "500"
+		}.else =>! "Unsuccess"
+		XCTAssert(nonOptional == "500")
+	
+
+//			this will crash due to =>! does not allow When to return nil
+//		nonOptional = When(a1).cases {
+//			1 => nil
+//			[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+//			500 => nil
+//		}.else =>! "Unsuccess"
+//		XCTAssert(nonOptional == "500")
+	
+			nonOptional = When(a1).cases {
+				1 => nil
+				[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+				100 => "100"
+			}.else =>? "Success"
+			XCTAssert(nonOptional == "Success")
+
+			nonOptional = When(a1).cases {
+				1 => nil
+				[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+				500 => "500"
+			}.else =>? "Unsuccess"
+			XCTAssert(nonOptional == "500")
+		
+
+	
+			nonOptional = When(a1).cases {
+				1 => nil
+				[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+				500 => nil
+			}.else =>? "Success"
+			XCTAssert(nonOptional == "Success")
+	
+	
+	}
+	
+		func testDefaultByOperatorsWithoutKeyWord() {
+			let a1: Int  = 500
+			let b1 = When(a1).cases {
+				1 => "one"
+				[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+				100 => "100"
+			} => "500"
+			XCTAssert(b1 == "500")
+		
+			
+			var nonOptional: String!
+			nonOptional = When(a1).cases {
+				1 => nil
+				[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+				100 => "100"
+			} =>! "500"
+			XCTAssert(nonOptional == "500")
+
+			nonOptional = When(a1).cases {
+				1 => nil
+				[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+				500 => "500"
+			} =>! "Unsuccess"
+			XCTAssert(nonOptional == "500")
+		
+
+	//			this will crash due to =>! does not allow When to return nil
+	//		nonOptional = When(a1).cases {
+	//			1 => nil
+	//			[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+	//			500 => nil
+	//		} =>! "Unsuccess"
+	//		XCTAssert(nonOptional == "500")
+		
+				nonOptional = When(a1).cases {
+					1 => nil
+					[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+					100 => "100"
+				} =>? "Success"
+				XCTAssert(nonOptional == "Success")
+
+				nonOptional = When(a1).cases {
+					1 => nil
+					[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+					500 => "500"
+				} =>? "Unsuccess"
+				XCTAssert(nonOptional == "500")
+			
+				nonOptional = When(a1).cases {
+					1 => nil
+					[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+					500 => nil
+				} =>? "Success"
+				XCTAssert(nonOptional == "Success")
+		
+		
+		}
+		
 #endif
 }
