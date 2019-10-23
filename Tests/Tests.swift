@@ -210,7 +210,7 @@ class Tests: XCTestCase {
 		XCTAssert(false => false => false == false)
 		XCTAssert(false => true => false == true)
 	}
-	
+
 	func testExamplesFromReadme() {
 		var number = 0
 		let a = When(number)
@@ -220,9 +220,9 @@ class Tests: XCTestCase {
 			.case(3) {"Number is correct"}
 			.case(4) {"Numbe is almost correct"}
 			.default("Number is too high")
-		
+
 		XCTAssert(a == "Invalid number")
-		
+
 		number = 10
 		let b = When<Int, String>(number)
 			.case(0) {"Invalid number"}
@@ -240,7 +240,7 @@ class Tests: XCTestCase {
 			.case(4) {"Numbe is almost correct"}
 			.default(nil) ?? "Number is too high"
 		XCTAssert(b1 == "Number is too high")
-		
+
 		let c = when(number) {
 			return $0 >= 10 ? "Big number" : "Small number"
 		}
@@ -264,7 +264,7 @@ class Tests: XCTestCase {
 
 		XCTAssert(nonOptionalResult == 3)
 	}
-	
+
 	func testWhenWithNoParam() {
 		let z = 3
 		let result = When()
@@ -273,9 +273,9 @@ class Tests: XCTestCase {
 			.case({ z == 3}) { 3 }
 			.case({"str" == "str"}) { -100 }
 			.default(nil) ?? 0
-		
+
 		XCTAssert(z == result)
-		
+
 		let result1 = When()
 			.case(3 > 5)
 			.case({0 == 10}) {0}
@@ -285,10 +285,10 @@ class Tests: XCTestCase {
 			.case({3 == 3}) {2}
 			.case({true}) {3}
 			.default(nil) ?? 4
-		
+
 		XCTAssert(1 == result1)
 	}
-	
+
 	class A1 {
 		var str: A2 = A2()
 		class A2 {
@@ -332,7 +332,7 @@ class Tests: XCTestCase {
 			}
 		}
 	}
-	
+
 	func testWith() {
 		let a = A1()
 		let b: B1 = B1()
@@ -354,7 +354,7 @@ class Tests: XCTestCase {
 			XCTAssert(false)
 		}
 	}
-	
+
 	func testLet() {
 		let a: A1? = A1()
 		let str = a.let {
@@ -362,7 +362,7 @@ class Tests: XCTestCase {
 		}
 		XCTAssert(str == "A3")
 	}
-	
+
 	func testRunMethod() {
 		let a: A1? = A1()
 		a.run {
@@ -370,18 +370,18 @@ class Tests: XCTestCase {
 			XCTAssert(str == "A3")
 		}
 	}
-	
+
 	func testApply() {
 		let a: A1? = A1()
 		_ = a?.str.str.str
 		a.apply {
 			$0.str.str.str = "New A3"
 		}
-		
+
 		a.map {
 			XCTAssert($0.str.str.str == "New A3")
 		}
-		
+
 		a.apply {
 			$0.str.str.str = "first iteration"
 			}.apply {
@@ -394,7 +394,7 @@ class Tests: XCTestCase {
 			XCTAssert($0.str.str.str == "third iteration")
 		}
 	}
-	
+
 	func testTakeWhen() {
 		var a: Int? = 2
 
@@ -403,7 +403,7 @@ class Tests: XCTestCase {
 		} else {
 			XCTAssert(false)
 		}
-		
+
 		a = 1
 		if let _ = a.takeWhen({$0 > 1}) {
 			XCTAssert(false)
@@ -424,14 +424,14 @@ class Tests: XCTestCase {
 		} else {
 			XCTAssert(false)
 		}
-		
+
 		if let validA = a.takeWhen({$0 > 1}).takeWhen({$0 == 100}) {
 			XCTAssert(validA == 100)
 		} else {
 			XCTAssert(false)
 		}
 	}
-	
+
 	func testWhenNewSyntax() {
 		let a = 5
 		let b = When(a) {
@@ -447,7 +447,7 @@ class Tests: XCTestCase {
 			$0.case(9) { "Nine" }
 			}.default(nil) ?? "Unknown"
 		XCTAssert(b == "Five")
-		
+
 		let c = When(a) {
 			$0.case({ $0 > 10 })
 			$0.case({$0 == 10})
@@ -462,7 +462,7 @@ class Tests: XCTestCase {
 			$0.case({$0 < 5})     {"Too low"}
 			}.default(nil) ?? "Unknown"
 		XCTAssert(c == "5")
-		
+
 		let d = When {
 			$0.case(3 > 5)
 			$0.case(6 > 20)
@@ -470,7 +470,7 @@ class Tests: XCTestCase {
 			$0.case(true) {"true"}
 			}.default(nil) ?? "Default"
 		XCTAssert(d == "true")
-		
+
 		let d1 = When {
 			$0.case(3 > 5)
 				.case({$0 == false})
@@ -479,7 +479,7 @@ class Tests: XCTestCase {
 				.case(true) {"true"}
 			}.default(nil) ?? "Default"
 		XCTAssert(d1 == "true")
-		
+
 		let d2 = When {
 			$0.case(3 > 5)
 			$0.case({$0 == false})
@@ -489,7 +489,7 @@ class Tests: XCTestCase {
 			}.default(nil) ?? "Default"
 		XCTAssert(d2 == "true")
 	}
-	
+
 	func testNewSyntax2() {
 		let a = 5
 		let b = When(a) {
@@ -505,7 +505,7 @@ class Tests: XCTestCase {
 			$0.case(9) =>  "Nine"
 			}.default(nil) ?? "Unknown"
 		XCTAssert(b == "Five")
-		
+
 		let b1 = When(a) {
 			$0.case(0) => "Zero"
 			$0.case(1) => "One"
@@ -519,7 +519,7 @@ class Tests: XCTestCase {
 			$0.case(9) =>  "Nine"
 			}.default(nil) ?? "Unknown"
 		XCTAssert(b1 == "Five")
-		
+
 		let b2 = When(a) {
 			$0.case(0) => "Zero"
 			$0.case(1) => "One"
@@ -533,7 +533,7 @@ class Tests: XCTestCase {
 			$0.case(9) =>  "Nine"
 			}.default(nil) ?? "Unknown"
 		XCTAssert(b2 == "More than one, less then 6")
-		
+
 		let d2 = When {
 			$0.case(3 > 5)
 				.case({$0 == false})
@@ -543,7 +543,7 @@ class Tests: XCTestCase {
 			}.default(nil) ?? "Default"
 		XCTAssert(d2 == "true")
 	}
-	
+
 	func test3dSyntax() {
 
 		let d = When(.simple) {
@@ -568,7 +568,7 @@ class Tests: XCTestCase {
 			$0(9) =>  "Nine"
 			}.default(nil) ?? "Unknown"
 		XCTAssert(b == "Five")
-		
+
 		let a1 = 2
 		let b1 = When(.simple, a1) {
 			$0(0) => "Zero"
@@ -583,7 +583,7 @@ class Tests: XCTestCase {
 			$0(9) =>  "Nine"
 			}.default(nil) ?? "Unknown"
 		XCTAssert(b1 == "Five")
-		
+
 		let n1 = 5
 		let r1 = When(.simple, n1) {
 			$0(0) => "Zero"
@@ -598,7 +598,7 @@ class Tests: XCTestCase {
 			$0(9) =>  "Nine"
 			}.default("dd")
 		XCTAssert(r1 == nil)
-		
+
 		let n2 = 5
 		let r2 = When(.simple, n2) {
 			$0(0) => "Zero"
@@ -615,7 +615,7 @@ class Tests: XCTestCase {
 			$0(9) =>  "Nine"
 			}.default("dd")
 		XCTAssert(r2 == "Five")
-		
+
 		let n3 = 5
 		let r3 = When(.simple, n3) {
 			$0(0) => "Zero"
@@ -632,7 +632,7 @@ class Tests: XCTestCase {
 			$0(9) =>  "Nine"
 			}.default("dd")
 		XCTAssert(r3 == "Five")
-		
+
 		let n4 = 5
 		let r4 = When(.simple, n4) {
 			$0(0) => "Zero"
@@ -649,7 +649,7 @@ class Tests: XCTestCase {
 			$0(9) =>  "Nine"
 			}.default("dd")
 		XCTAssert(r4 == "Five")
-		
+
 		let n5 = 5
 		let r5 = When(.simple, n5) {
 			$0(0) => "Zero"
@@ -667,10 +667,10 @@ class Tests: XCTestCase {
 			}.default("dd")
 		XCTAssert(r5 == "Five")
 	}
-	
+
 	func testComplex() {
 		let testState = TestState.idle
-		
+
 		let stateInt = When(testState)
 			.case(.idle)      { 0 }
 			.case(.preparing) { nil }
@@ -680,7 +680,7 @@ class Tests: XCTestCase {
 			.case(.finished)  { 5 }
 			.case(.wrong) 	  { 6 }
 			.default(nil) ?? 0
-		
+
 		XCTAssert(stateInt == 0)
 
 		let stateInt1 = When<TestState, Int>(testState)
@@ -692,7 +692,7 @@ class Tests: XCTestCase {
 			.case({ $0 == .finished })  { 5 }
 			.case({ $0 == .wrong })     { 6 }
 			.default(nil) ?? 0
-		
+
 		XCTAssert(stateInt1 == 0)
 
 		let stateInt2 = When(testState) {
@@ -705,7 +705,7 @@ class Tests: XCTestCase {
 			$0.case(.wrong)     { 6 }
 			}
 			.default(nil) ?? 0
-		
+
 		XCTAssert(stateInt2 == 0)
 
 		let stateInt3 = When(testState) {
@@ -718,7 +718,7 @@ class Tests: XCTestCase {
 			$0.case(.wrong)     => { 6 }()
 			}
 			.default(nil) ?? 0
-		
+
 		XCTAssert(stateInt3 == 0)
 
 		let stateInt4 = When(testState) {
@@ -731,7 +731,7 @@ class Tests: XCTestCase {
 			$0.case(.wrong)     => 6
 			}
 			.default(nil) ?? 0
-		
+
 		XCTAssert(stateInt4 == 0)
 
 		let stateInt5 = When(testState) {
@@ -744,7 +744,7 @@ class Tests: XCTestCase {
 			$0.case({ $0 == .wrong })     => 6
 			}
 			.default(nil) ?? 0
-		
+
 		XCTAssert(stateInt5 == 0)
 
 
@@ -760,7 +760,7 @@ class Tests: XCTestCase {
 			.default(nil) ?? 0
 
 		XCTAssert(stateInt6 == 0)
-		
+
 		let stateInt7 = When(.simple, testState) {
 			$0({ $0 == TestState.idle })      => 0
 			$0({ $0 == TestState.preparing }) => nil
@@ -774,7 +774,7 @@ class Tests: XCTestCase {
 
 		XCTAssert(stateInt7 == 0)
 	}
-	
+
 	func testSimpleAndClosure() {
 
 		let testState = TestState.idle
@@ -791,7 +791,7 @@ class Tests: XCTestCase {
 			.default(nil) ?? 0
 
 		XCTAssert(stateInt == 0)
-		
+
 		let stateInt1 = When(testState) {
 			$0.case(TestState.idle)      => { 0 }
 			$0.case(TestState.preparing) => { nil }
@@ -817,7 +817,7 @@ class Tests: XCTestCase {
 			.default(nil) ?? 0
 
 		XCTAssert(stateInt2 == 0)
-		
+
 		let stateInt3 = When {
 			$0.case({testState == TestState.idle})      => { 0 }
 			$0.case({testState == TestState.preparing}) => { nil }
@@ -864,7 +864,7 @@ class Tests: XCTestCase {
 
 	func testNewDefaultWithBlock() {
 		let a: Int = 5
-		
+
 		let b = When(a)
 			.case(0) {"0"}
 			.case(1) {"1"}
@@ -876,7 +876,7 @@ class Tests: XCTestCase {
 				}
 		}
 		XCTAssert(b == " >= 5")
-		
+
 		let c =  When<Int, String>(a) {
 			$0.case(0) => "0"
 			$0.case(1) => "1"
@@ -890,9 +890,9 @@ class Tests: XCTestCase {
 		}
 		XCTAssert(c == " >= 5")
 	}
-	
+
 	#if swift(>=5.1.0)
-	
+
 	func doTesting(_ test: Int) -> String? {
 		return When<Int, String>(test).cases {
 			{$0 == 1} => "1"
@@ -906,7 +906,7 @@ class Tests: XCTestCase {
 	}.default("0")
 
 	}
-	
+
 	func testOperatorAfterCase() {
 		let a: Int  = 1
 		let a1: Int = 2
@@ -925,5 +925,18 @@ class Tests: XCTestCase {
 		XCTAssert(doTesting(a6) == ">=5")
 		XCTAssert(doTesting(a7) == "0")
 	}
-	#endif
+	
+	func testOneCase() {
+		let a: Int  = 1
+		let b = When(a).cases {
+			1 => "one"
+		}.else("unknown")
+		XCTAssert(b == "one")
+		
+		let b1 = When(a).case {
+			1 => "one"
+		}.else("unknown")
+		XCTAssert(b1 == "one")
+	}
+#endif
 }

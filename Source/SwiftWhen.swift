@@ -62,6 +62,11 @@ open class When<Type, Result> {
 		var condition2:    (() -> Bool)?
 		var caseToCompare: Type?
 		var handler:       (() -> Result?)?
+		var cases: [OneCase] = [OneCase]()
+		
+		init() {
+		
+		}
 		
 		init(caseToCompare: Type, handler: (() -> Result?)? = nil) {
 			self.caseToCompare = caseToCompare
@@ -79,12 +84,23 @@ open class When<Type, Result> {
 		}
 	}
 	
-	public struct Cases {
-		var cases: [OneCase] = [OneCase]()
+	public typealias Cases = OneCase
+
+	@_functionBuilder
+	public struct WhenBuilderOneCase {
+	
+		//to support only one case
+		static func buildBlock(_ cases: OneCase) -> Cases {
+			var all_cases = Cases()
+			all_cases.cases.append(cases)
+			return all_cases
+		}
+
 	}
 	
 	@_functionBuilder
 	public struct WhenBuilder {
+		
 		static func buildBlock(_ cases: OneCase...) -> Cases {
 			var all_cases = Cases()
 			for element in cases {
@@ -229,6 +245,12 @@ public extension When where Type: Equatable {
 		return true
 	}
 
+	func `case`(@WhenBuilderOneCase block: () -> Cases) -> When<Type, Result> {
+		let cases = block()
+		self.applyCases(cases)
+		return self
+	}
+
 	func cases(@WhenBuilder block: () -> Cases) -> When<Type, Result> {
 		let cases = block()
 		self.applyCases(cases)
@@ -250,6 +272,10 @@ public extension When where Type: Equatable {
 	}
 	
 	private func applyCases(_ cases: Cases) {
+		if cases.cases.count == 0 {
+			self.applyCase(cases)
+		}
+	
 		for oneCase in cases.cases {
 			self.applyCase(oneCase)
 		}
