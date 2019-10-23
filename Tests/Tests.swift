@@ -1008,7 +1008,7 @@ class Tests: XCTestCase {
 			1 => "one"
 			[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
 			100 => "100"
-		}.else => "500"
+		}.else => {"500"} //to test block as return parameter
 		XCTAssert(b1 == "500")
 	
 		
@@ -1083,7 +1083,7 @@ class Tests: XCTestCase {
 			nonOptional = When(a1).cases {
 				1 => nil
 				[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
-				500 => "500"
+				500 => {"500"} //to test block as return parameter
 			} =>! "Unsuccess"
 			XCTAssert(nonOptional == "500")
 		
@@ -1114,7 +1114,7 @@ class Tests: XCTestCase {
 					1 => nil
 					[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
 					500 => nil
-				} =>? "Success"
+				} =>? {"Success"} //to test block as return parameter
 				XCTAssert(nonOptional == "Success")
 		
 		
