@@ -937,6 +937,69 @@ class Tests: XCTestCase {
 			1 => "one"
 		}.else("unknown")
 		XCTAssert(b1 == "one")
+	
+	//This can not be build due to case only support one conditon. Uncomment to see build error
+//		let b2 = When(a).case {
+//			1 => "one"
+//			2 => "one"
+//		}.else("unknown")
+		
+	}
+	
+	func testCasesUnion() {
+		let a: Int  = 100
+		let b = When(a).cases {
+			1 => "one"
+			cases(2, 3, 4, 5, 6, 7, 8) => "2 - 8"
+			100 => "100"
+		}.else("else")
+		XCTAssert(b == "100")
+
+		let a1: Int  = 5
+		let b1 = When(a1).cases {
+			1 => "one"
+			cases(2, 3, 4, 5, 6, 7, 8) => "2 - 8"
+			100 => "100"
+		}.else("100")
+		XCTAssert(b1 == "2 - 8")
+
+		let b2 = When(a).cases {
+			cases(1, 100, 3, 4, 5, 6, 7, 8) => "Success"
+		}.else("100")
+		XCTAssert(b2 == "Success")
+		
+		let b3 = When(a).case {
+			cases(1, 100, 3, 4, 5, 6, 7, 8) => "Success"
+		}.else("100")
+		XCTAssert(b3 == "Success")
+	}
+	
+	func testCasesUnionByArray() {
+		let a: Int  = 100
+		let b = When(a).cases {
+			1 => "one"
+			[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+			100 => "100"
+		}.else("else")
+		XCTAssert(b == "100")
+
+		let a1: Int  = 5
+		let b1 = When(a1).cases {
+			1 => "one"
+			[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+			100 => "100"
+		}.else("100")
+		XCTAssert(b1 == "2 - 8")
+
+		let b2 = When(a).cases {
+			[1, 100, 3, 4, 5, 6, 7, 8] => "Success"
+		}.else("100")
+		XCTAssert(b2 == "Success")
+		
+		let b3 = When(a).case {
+			[1, 100, 3, 4, 5, 6, 7, 8] => "Success"
+		}.else("100")
+		XCTAssert(b3 == "Success")
 	}
 #endif
 }

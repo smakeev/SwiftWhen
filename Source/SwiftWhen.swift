@@ -237,6 +237,50 @@ public extension When where Type == Bool {
 	}
 }
 
+#if swift(>=5.1.0)
+
+public struct UnionCases<Type> {
+	var cases = [Type]()
+}
+
+public func cases<Type>(_ cases: Type...) -> UnionCases<Type> {
+	var union_cases = UnionCases<Type>()
+	
+	for oneCase in cases {
+		union_cases.cases.append(oneCase)
+	}
+	
+	return union_cases
+}
+
+public func => <Type, Result> (lhs: [Type], rhs: Result) -> When<Type, Result>.OneCase where Type: Equatable {
+	let oneCase = When<Type, Result>.OneCase(condition1: { what in
+		for item in lhs {
+			if what == item {
+				return true
+			}
+		}
+		return false
+	}, handler: { rhs })
+	
+	return oneCase
+}
+
+public func => <Type, Result> (lhs: UnionCases<Type>, rhs: Result) -> When<Type, Result>.OneCase where Type: Equatable {
+	let oneCase = When<Type, Result>.OneCase(condition1: { what in
+		for item in lhs.cases {
+			if what == item {
+				return true
+			}
+		}
+		return false
+	}, handler: { rhs })
+	
+	return oneCase
+}
+
+#endif
+
 public extension When where Type: Equatable {
 	
 #if swift(>=5.1.0)
