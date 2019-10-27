@@ -1119,9 +1119,21 @@ class Tests: XCTestCase {
 					500 => nil
 				} =>? {"Success"} //to test block as return parameter
 				XCTAssert(nonOptional == "Success")
-		
-		
 		}
+		
+	func testRanges() {
+			let a = 150
+			let nonOptional: String = When<Int, String>(a).cases {
+					1 => nil
+					[2, 3, 4, 5, 6, 7, 8] => "2 - 8"
+					100 => "100"
+					90..<200     => "[90-200)"
+					200..<300    => {"[200-300)"}
+					300...400    => {"[300-400]"}
+					400...500    => "[400-500]"
+				} =>? "Default"
+				XCTAssert(nonOptional == "[90-200)")
+	}
 		
 #endif
 }

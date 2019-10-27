@@ -20,6 +20,23 @@ public struct DefaultPresenter<Type, Result> {
 
 #if swift(>=5.1.0)
 
+
+public func => <Type, Result> (lhs: ClosedRange<Type>, rhs: @escaping () -> Result?)  -> When<Type, Result>.OneCase where Type: Comparable {
+	return When<Type, Result>.OneCase(condition1: {lhs.contains($0)}, handler: rhs)
+}
+
+public func => <Type, Result> (lhs: ClosedRange<Type>, rhs: @autoclosure @escaping () -> Result?)  -> When<Type, Result>.OneCase where Type: Comparable {
+	return When<Type, Result>.OneCase(condition1: {lhs.contains($0)}, handler: rhs)
+}
+
+public func => <Type, Result> (lhs: Range<Type>, rhs: @escaping () -> Result?)  -> When<Type, Result>.OneCase where Type: Comparable {
+	return When<Type, Result>.OneCase(condition1: {lhs.contains($0)}, handler: rhs)
+}
+
+public func => <Type, Result> (lhs: Range<Type>, rhs: @autoclosure @escaping () -> Result?)  -> When<Type, Result>.OneCase where Type: Comparable {
+	return When<Type, Result>.OneCase(condition1: {lhs.contains($0)}, handler: rhs)
+}
+
 public 	func => <Type, Result> (lhs: @escaping (Type) -> Bool , rhs: @autoclosure @escaping () -> Result?) -> When<Type, Result>.OneCase  where Type: Equatable  {
 	return When<Type, Result>.OneCase(condition1: lhs, handler:  rhs)
 }
