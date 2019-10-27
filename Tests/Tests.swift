@@ -464,28 +464,28 @@ class Tests: XCTestCase {
 		XCTAssert(c == "5")
 
 		let d = When {
-			$0.case(3 > 5)
-			$0.case(6 > 20)
-			$0.case(false) {"No way"}
-			$0.case(true) {"true"}
+			$0.case({3 > 5})
+			$0.case({6 > 20})
+			$0.case({false}) {"No way"}
+			$0.case({true}) {"true"}
 			}.default(nil) ?? "Default"
 		XCTAssert(d == "true")
 
 		let d1 = When {
-			$0.case(3 > 5)
+			$0.case({3 > 5})
 				.case({$0 == false})
-				.case(6 > 20)
-				.case(false) {"No way"}
-				.case(true) {"true"}
+				.case({6 > 20})
+				.case({false}) {"No way"}
+				.case({true}) {"true"}
 			}.default(nil) ?? "Default"
 		XCTAssert(d1 == "true")
 
 		let d2 = When {
-			$0.case(3 > 5)
+			$0.case({3 > 5})
 			$0.case({$0 == false})
-			$0.case(6 > 20)
-			$0.case(false) {"No way"}
-			$0.case(true) {"true"}
+			$0.case({6 > 20})
+			$0.case({false}) {"No way"}
+			$0.case({true}) {"true"}
 			}.default(nil) ?? "Default"
 		XCTAssert(d2 == "true")
 	}
@@ -535,11 +535,11 @@ class Tests: XCTestCase {
 		XCTAssert(b2 == "More than one, less then 6")
 
 		let d2 = When {
-			$0.case(3 > 5)
+			$0.case({3 > 5})
 				.case({$0 == false})
-				.case(6 > 20)
-				.case(false) { "No way" }
-			$0.case(true) {"true"}
+				.case({6 > 20})
+				.case({false}) { "No way" }
+			$0.case({true}) {"true"}
 			}.default(nil) ?? "Default"
 		XCTAssert(d2 == "true")
 	}
@@ -893,17 +893,18 @@ class Tests: XCTestCase {
 
 	#if swift(>=5.1.0)
 
-	func doTesting(_ test: Int) -> String? {
+	func doTesting(_ test: Int, extra: String? = nil) -> String? {
 		return When<Int, String>(test).cases {
-			{$0 == 1} => "1"
-			{$0 == 2} => "2"
-			{3 == 4}  => "Strange"
-			3        => "3"
-			4        => "4"
-			5        => .skip
-			6        => .skip
-			7        => ">=5"
-	}.default("0")
+			{$0 == 1}           => "1"
+			{$0 == 2}           => {"2"}
+			extra == "extra"    => "extra"
+			extra == "extra2"   => {"extra2"}
+			3                   => "3"
+			4                   => "4"
+			5                   => .skip
+			6                   => .skip
+			7                   => ">=5"
+		}.default("0")
 
 	}
 
@@ -924,6 +925,8 @@ class Tests: XCTestCase {
 		XCTAssert(doTesting(a5) == ">=5")
 		XCTAssert(doTesting(a6) == ">=5")
 		XCTAssert(doTesting(a7) == "0")
+		XCTAssert(doTesting(0, extra: "extra") == "extra")
+		XCTAssert(doTesting(0, extra: "extra2") == "extra2")
 	}
 	
 	func testOneCase() {

@@ -20,24 +20,24 @@ public struct DefaultPresenter<Type, Result> {
 
 #if swift(>=5.1.0)
 
-public 	func => <Type, Result> (lhs: @escaping (Type) -> Bool , rhs: Result?) -> When<Type, Result>.OneCase  where Type: Equatable  {
-	return When<Type, Result>.OneCase(condition1: lhs, handler: { rhs } )
+public 	func => <Type, Result> (lhs: @escaping (Type) -> Bool , rhs: @autoclosure @escaping () -> Result?) -> When<Type, Result>.OneCase  where Type: Equatable  {
+	return When<Type, Result>.OneCase(condition1: lhs, handler:  rhs)
 }
 
-public 	func => <Type, Result> (lhs: @escaping () -> Bool , rhs: Result?) -> When<Type, Result>.OneCase  where Type: Equatable  {
-	return When<Type, Result>.OneCase(condition2: lhs, handler: { rhs })
+public 	func => <Type, Result> (lhs: @autoclosure @escaping () -> Bool , rhs: @autoclosure @escaping () -> Result?) -> When<Type, Result>.OneCase  where Type: Equatable  {
+	return When<Type, Result>.OneCase(condition2: lhs, handler: rhs)
+}
+
+public 	func => <Type, Result> (lhs: @autoclosure @escaping () -> Bool , rhs: @escaping () -> Result?) -> When<Type, Result>.OneCase  where Type: Equatable  {
+	return When<Type, Result>.OneCase(condition2: lhs, handler: rhs)
 }
 
 public 	func => <Type, Result> (lhs: @escaping (Type) -> Bool , rhs: @escaping () -> Result?) -> When<Type, Result>.OneCase  where Type: Equatable  {
 	return When<Type, Result>.OneCase(condition1: lhs, handler: rhs)
 }
 
-public 	func => <Type, Result> (lhs: @escaping () -> Bool , rhs: @escaping () -> Result?) -> When<Type, Result>.OneCase  where Type: Equatable  {
-	return When<Type, Result>.OneCase(condition2: lhs, handler: rhs)
-}
-
-public 	func => <Type, Result> (lhs: Type , rhs: Result?) -> When<Type, Result>.OneCase where Type: Equatable {
-	return When<Type, Result>.OneCase(caseToCompare: lhs , handler: { rhs })
+public 	func => <Type, Result> (lhs: Type , rhs: @autoclosure @escaping () ->Result?) -> When<Type, Result>.OneCase where Type: Equatable {
+	return When<Type, Result>.OneCase(caseToCompare: lhs , handler:  rhs)
 }
 
 public 	func => <Type, Result> (lhs: Type , rhs: @escaping () -> Result?) -> When<Type, Result>.OneCase where Type: Equatable {
@@ -127,6 +127,11 @@ open class When<Type, Result> {
 			return self
 		}
 		@discardableResult public func `case`(_ condition: @escaping () -> Bool,  handler: (() -> Result?)? = nil) -> Case {
+			owner.case(condition, handler: handler)
+			return self
+		}
+		
+		@discardableResult public func `case`(_ condition: @autoclosure @escaping () -> Bool,  handler: (() -> Result?)? = nil) -> Case {
 			owner.case(condition, handler: handler)
 			return self
 		}
