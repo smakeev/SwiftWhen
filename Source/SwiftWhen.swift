@@ -5,6 +5,8 @@
 //  Created by Sergey Makeev on 22/08/2019.
 //  Copyright © 2019 SOME projects. All rights reserved.
 //
+import UIKit
+
 let when_else = WhenElse()
 
 class WhenElse {}
@@ -25,23 +27,22 @@ precedencegroup OptionalLogicalFollowng {
 
 infix operator => : LogicalFollowng
 
-func => <T, R>(lhs: WhenElse, rhs:@escaping () -> R?) -> WhenItem<T, R> {
-    WhenItem<T, R>(condition: true, result: rhs)
-}
-
-func => <T, R>(lhs: T, rhs: @escaping () -> R?) -> WhenItem<T, R> {
+func => <T, R>(lhs: T, rhs: @escaping () -> R?) -> WhenItem<R> {
     if let value = lhs as? Bool {
-        return WhenItem<T, R>(condition: value, result: rhs)
+        return WhenItem<R>(condition: value, result: rhs)
     }
-    return WhenItem<T, R>(valueToCompare: lhs, result: rhs)
+    if lhs is WhenElse {
+        WhenItem<R>(condition: true, result: rhs)
+    }
+    return WhenItem<R>(valueToCompare: lhs, result: rhs)
 }
 
-func => <T, R>(lhs: T, rhs: R?) -> WhenItem<T, R> {
+func => <R>(lhs: Any, rhs: R?) -> WhenItem<R> {
     lhs => {rhs}
 }
 
-public struct WhenItem<T, R> {
-    let valueToCompare: T?
+public struct WhenItem<R> {
+    let valueToCompare: Any?
     let condition: Bool
     let result: () -> R?
 
@@ -51,7 +52,7 @@ public struct WhenItem<T, R> {
         self.result = result
     }
 
-    init(valueToCompare: T,  result: @escaping () -> R?) {
+    init(valueToCompare: Any,  result: @escaping () -> R?) {
         self.condition = false
         self.valueToCompare = valueToCompare
         self.result = result
@@ -59,27 +60,30 @@ public struct WhenItem<T, R> {
 }
 
 @resultBuilder
-struct SwiftWhen<T, R> {
-    static func buildBlock(_ components: [WhenItem<T, R>]...) -> [WhenItem<T, R>] {
+struct SwiftWhen<R> {
+    static func buildBlock(_ components: [WhenItem<R>]...) -> [WhenItem<R>] {
         components.flatMap {$0}
     }
 
-    static func buildExpression(_ expression: WhenItem<T, R>) -> [WhenItem<T, R>] {
+    static func buildExpression(_ expression: WhenItem<R>) -> [WhenItem<R>] {
         [expression]
     }
 }
 
-@discardableResult func when<T: Equatable, R>(_ conditionVariable: T, @SwiftWhen<T, R> items: () -> [WhenItem<T, R>]) -> R? {
+@discardableResult func when<T: Equatable, R>(_ conditionVariable: T, @SwiftWhen<R> items: () -> [WhenItem<R>]) -> R? {
     for item in items() {
-        if item.condition == true ||
-            item.valueToCompare == conditionVariable {
+        if item.condition == true {
+            return item.result()
+        }
+        if let itemValue = item.valueToCompare as? T,
+           itemValue == conditionVariable {
             return item.result()
         }
     }
     return nil
 }
 
-@discardableResult func when<T, R>(@SwiftWhen<T, R> items: () -> [WhenItem<T, R>]) -> R? {
+@discardableResult func when<R>(@SwiftWhen<R> items: () -> [WhenItem<R>]) -> R? {
     for item in items() {
         if item.condition == true {
             return item.result()
@@ -138,6 +142,7 @@ let result3: String? = when(a) {
 }
 print(result3 ?? "nil")
 
+
 print("==========")
 
 print("SSS1")
@@ -147,7 +152,7 @@ let result11 = when {
     a == 15 => "15"
     a == 10 => "ten"
     a == 0 => "thero"
-   // when_else => "unknown"
+    when_else => "unknown"
 }
 
 str1 = result11! // To check that result is not Any.
@@ -160,7 +165,7 @@ let result21: String? = when {
     a == 15 => "15"
     a == 10 => "ten"
     a == 0 => "thero"
-   // when_else => "unknown"
+    when_else => "unknown"
 }
 
 print(result21 ?? "nil")
@@ -169,7 +174,7 @@ let result22 = when(a) {
     15 => "15"
     10 => "ten"
     0 => "thero"
-  //  when_else => "unknown"
+    when_else => "unknown"
 }
 
 print(result22 ?? "nil")
@@ -178,6 +183,17 @@ let result23: String? = when(a) {
     15 => "15"
     10 => "ten"
     0 => "thero"
-  //  when_else => "unknown"
+    when_else => "unknown"
 }
 print(result23 ?? "nil")
+
+print("=========")
+print("MIXED")
+let result31: String? = when(a) {
+    15 => "15"
+    10 => {"ten"}
+    true => "true"
+    true => {"true in closure"}
+    0 => "thero"
+    when_else => "unknown"
+}
