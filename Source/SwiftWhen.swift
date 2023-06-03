@@ -5,8 +5,6 @@
 //  Created by Sergey Makeev on 22/08/2019.
 //  Copyright © 2019 SOME projects. All rights reserved.
 //
-import UIKit
-
 let when_else = WhenElse()
 
 class WhenElse {}
@@ -32,7 +30,7 @@ func => <T, R>(lhs: T, rhs: @escaping () -> R?) -> WhenItem<R> {
         return WhenItem<R>(condition: value, result: rhs)
     }
     if lhs is WhenElse {
-        WhenItem<R>(condition: true, result: rhs)
+        return WhenItem<R>(condition: true, result: rhs)
     }
     return WhenItem<R>(valueToCompare: lhs, result: rhs)
 }
@@ -40,6 +38,15 @@ func => <T, R>(lhs: T, rhs: @escaping () -> R?) -> WhenItem<R> {
 func => <R>(lhs: Any, rhs: R?) -> WhenItem<R> {
     lhs => {rhs}
 }
+
+//// For closure from the left
+//func => <T, R>(lhs: () -> T, rhs: R?) -> WhenItem<R> {
+//    lhs() => {rhs}
+//}
+//
+//func => <T, R>(lhs: () -> T, rhs: @escaping () -> R?) -> WhenItem<R> {
+//    lhs() => rhs
+//}
 
 public struct WhenItem<R> {
     let valueToCompare: Any?
@@ -95,9 +102,9 @@ struct SwiftWhen<R> {
 let a = 15
 print("SSS")
 when {
-    a == 15 => {print("15")}
     a == 10 => {print("ten")}
     a == 0 => {print("thero")}
+    a == 15 => {print("15")}
     when_else => {print("unknown")}
 }
 print("SSS1")
@@ -197,3 +204,18 @@ let result31: String? = when(a) {
     0 => "thero"
     when_else => "unknown"
 }
+
+print(result31 ?? "nil")
+//print("=========")
+//print("LEFT CLOSURE")
+//
+//let resultX = when {
+//    //{ true } => {"TRUE"}
+//    { true } => "TRUE"
+//    {false} => "Lala"
+//    {45 + 15} => {"GO"}
+//    false => "false"
+//    when_else => {"unknown"}
+//}
+//
+//print(resultX)
