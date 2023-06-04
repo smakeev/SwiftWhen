@@ -5,6 +5,7 @@
 //  Created by Sergey Makeev on 22/08/2019.
 //  Copyright © 2019 SOME projects. All rights reserved.
 //
+
 let when_else = WhenElse()
 
 class WhenElse {}
@@ -26,27 +27,26 @@ precedencegroup OptionalLogicalFollowng {
 infix operator => : LogicalFollowng
 
 func => <T, R>(lhs: T, rhs: @escaping () -> R?) -> WhenItem<R> {
-    if let value = lhs as? Bool {
+    let leftValue: Any = {
+        if let closure = lhs as? () -> Bool {
+            return closure()
+        }
+        return lhs
+    }()
+
+    if let value = leftValue as? Bool {
         return WhenItem<R>(condition: value, result: rhs)
     }
-    if lhs is WhenElse {
+
+    if leftValue is WhenElse {
         return WhenItem<R>(condition: true, result: rhs)
     }
-    return WhenItem<R>(valueToCompare: lhs, result: rhs)
+    return WhenItem<R>(valueToCompare: leftValue, result: rhs)
 }
 
-func => <R>(lhs: Any, rhs: R?) -> WhenItem<R> {
-    lhs => {rhs}
+func => <R>(lhs: Any, rhs: @escaping @autoclosure () -> R?) -> WhenItem<R> {
+    lhs => rhs
 }
-
-//// For closure from the left
-//func => <T, R>(lhs: () -> T, rhs: R?) -> WhenItem<R> {
-//    lhs() => {rhs}
-//}
-//
-//func => <T, R>(lhs: () -> T, rhs: @escaping () -> R?) -> WhenItem<R> {
-//    lhs() => rhs
-//}
 
 public struct WhenItem<R> {
     let valueToCompare: Any?
@@ -77,7 +77,7 @@ struct SwiftWhen<R> {
     }
 }
 
-@discardableResult func when<T: Equatable, R>(_ conditionVariable: T, @SwiftWhen<R> items: () -> [WhenItem<R>]) -> R? {
+@discardableResult func when<T: Comparable, R>(_ conditionVariable: T, @SwiftWhen<R> items: () -> [WhenItem<R>]) -> R? {
     for item in items() {
         if item.condition == true {
             return item.result()
@@ -85,6 +85,36 @@ struct SwiftWhen<R> {
         if let itemValue = item.valueToCompare as? T,
            itemValue == conditionVariable {
             return item.result()
+        }
+        // check for range
+        if let range = item.valueToCompare as? Range<T> {
+            if range.contains(conditionVariable) {
+                return item.result()
+            }
+        }
+        // check for closed range
+        if let range = item.valueToCompare as? ClosedRange<T> {
+            if range.contains(conditionVariable) {
+                return item.result()
+            }
+        }
+        // check for PartialRangeFrom
+        if let range = item.valueToCompare as? PartialRangeFrom<T> {
+            if conditionVariable >= range.lowerBound {
+                return item.result()
+            }
+        }
+        // chekc for PartialRangeUpTo
+        if let range = item.valueToCompare as? PartialRangeUpTo<T> {
+            if conditionVariable < range.upperBound {
+                return item.result()
+            }
+        }
+        // chack PartialRangeThrough
+        if let range = item.valueToCompare as? PartialRangeThrough<T> {
+            if conditionVariable <= range.upperBound {
+                return item.result()
+            }
         }
     }
     return nil
@@ -206,16 +236,20 @@ let result31: String? = when(a) {
 }
 
 print(result31 ?? "nil")
-//print("=========")
-//print("LEFT CLOSURE")
-//
-//let resultX = when {
-//    //{ true } => {"TRUE"}
-//    { true } => "TRUE"
-//    {false} => "Lala"
-//    {45 + 15} => {"GO"}
-//    false => "false"
-//    when_else => {"unknown"}
-//}
-//
-//print(resultX)
+
+// ranged
+
+
+let result41 = when(a) {
+    //1..<20 => "In Range"
+    //1...20 => "In Closed Range"
+    //5... => "In ParticialRangeFrom"
+    //..<25 => "In PartialRangeUpTo"
+    ...15 => "In PartialRangeThrough"
+    15 => "15"
+    10 => "ten"
+    0 => "thero"
+    when_else => "unknown"
+}
+
+print(result41 ?? "nil")
