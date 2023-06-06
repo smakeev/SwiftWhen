@@ -86,6 +86,44 @@ struct SwiftWhen<R> {
            itemValue == conditionVariable {
             return item.result()
         }
+        if let caseItems = item.valueToCompare as? Array<Any> {
+            for caseItem in caseItems {
+                if let boolValue = caseItem as? Bool, boolValue == true {
+                    return item.result()
+                }
+
+                if let value = caseItem as? T, value == conditionVariable {
+                    return item.result()
+                }
+
+                // range
+                if let value = caseItem as? Range<T>,
+                    value.contains(conditionVariable) {
+                    return item.result()
+                }
+                //closed range
+                if let value = caseItem as? ClosedRange<T>,
+                    value.contains(conditionVariable) {
+                    return item.result()
+                }
+                // PartialRangeFrom
+                 if let value = caseItem as? PartialRangeFrom<T>,
+                    conditionVariable >= value.lowerBound {
+                    return item.result()
+                }
+                //PartialRangeUpTo
+                if let value = caseItem as? PartialRangeUpTo<T>,
+                    conditionVariable < value.upperBound {
+                    return item.result()
+                }
+                //PartialRangeUpTo
+                if let value = caseItem as? PartialRangeThrough<T>,
+                    conditionVariable <= value.upperBound {
+                    return item.result()
+                }
+            }
+        }
+
         // check for range
         if let range = item.valueToCompare as? Range<T> {
             if range.contains(conditionVariable) {
@@ -239,7 +277,6 @@ print(result31 ?? "nil")
 
 // ranged
 
-
 let result41 = when(a) {
     //1..<20 => "In Range"
     //1...20 => "In Closed Range"
@@ -253,3 +290,35 @@ let result41 = when(a) {
 }
 
 print(result41 ?? "nil")
+
+// cases joint
+
+let result51 = when(a) {
+    [
+        11,
+        10,
+        12,
+        15
+    ] => "<= 15"
+    16 => "> 15"
+    when_else => "unknown"
+}
+
+print(result51 ?? "nil")
+
+
+let result52 = when(a) {
+    [
+      1..<20,
+      1...20,
+      5...,
+      ..<25,
+      ...15
+    ] => "In One of ranges"
+    15 => "15"
+    10 => "ten"
+    0 => "thero"
+    when_else => "unknown"
+}
+
+print(result52 ?? "nil")
