@@ -5,7 +5,6 @@
 //  Created by Sergey Makeev on 22/08/2019.
 //  Copyright © 2019 SOME projects. All rights reserved.
 //
-
 let when_else = WhenElse()
 
 class WhenElse {}
@@ -158,13 +157,93 @@ struct SwiftWhen<R> {
     return nil
 }
 
+@discardableResult func when<T: Equatable, R>(_ conditionVariable: T, @SwiftWhen<R> items: () -> [WhenItem<R>]) -> R? {
+    for item in items() {
+        if item.condition == true {
+            return item.result()
+        }
+        if let caseItems = item.valueToCompare as? Array<Any> {
+           for arrayItem in caseItems {
+                if let boolValue = arrayItem as? Bool, boolValue == true {
+                    return item.result()
+                }
+                 if let value = arrayItem as? T {
+                    switch conditionVariable {
+                    case value:
+                        return item.result()
+                    default:
+                    continue
+                    }
+                }
+           }
+        }
+        if let value = item.valueToCompare as? T {
+
+            switch conditionVariable {
+            case value:
+                return item.result()
+            default:
+                continue
+            }
+        }
+    }
+    return nil
+}
+
+@discardableResult func when<T, R>(_ conditionVariable: T, rule: (T, T) -> Bool, @SwiftWhen<R> items: () -> [WhenItem<R>]) -> R? {
+    for item in items() {
+        if item.condition == true {
+            return item.result()
+        }
+         if let caseItems = item.valueToCompare as? Array<Any> {
+            for arrayItem in caseItems {
+                if let boolValue = arrayItem as? Bool, boolValue == true {
+                    return item.result()
+                }
+                if let tValue = arrayItem as? T {
+                    if rule(conditionVariable, tValue) {
+                        return item.result()
+                    }
+                }
+            }
+         }
+         if let value = item.valueToCompare as? T {
+            if rule(conditionVariable, value) {
+                return item.result()
+            }
+         
+         }
+    }
+    
+    return nil
+}
+
 @discardableResult func when<R>(@SwiftWhen<R> items: () -> [WhenItem<R>]) -> R? {
     for item in items() {
         if item.condition == true {
             return item.result()
         }
+        if let caseItems = item.valueToCompare as? Array<Any> {
+            for arrayItem in caseItems {
+                if let boolValue = arrayItem as? Bool, boolValue == true {
+                    return item.result()
+                }
+            }
+        }
     }
     return nil
+}
+
+func checkSameCaseRule<T>() -> (T, T) -> Bool {
+    return { (value1, value2) -> Bool in
+        let mirror1 = Mirror(reflecting: value1)
+        let mirror2 = Mirror(reflecting: value2)
+        
+        guard let case1 = mirror1.children.first?.label, let case2 = mirror2.children.first?.label else {
+            return false
+        }
+        return case1 == case2
+    }
 }
 
 let a = 15
@@ -322,3 +401,69 @@ let result52 = when(a) {
 }
 
 print(result52 ?? "nil")
+
+/////////////////
+enum SomeEnum {
+    case first
+    case second
+}
+
+let enumV1 = SomeEnum.second
+
+let resultEnumTest = when(enumV1) {
+    SomeEnum.first => "first"
+    SomeEnum.second => "second"
+    when_else => "unknown"
+}
+
+print(resultEnumTest ?? "nil")
+
+// associated type
+enum SomeEnumWithString: String {
+    case first = "first_str"
+    case second = "second_str"
+}
+
+let enumV2 = SomeEnumWithString.second
+
+let resultEnumTest1 = when(enumV2) {
+    [
+        SomeEnumWithString.first,
+        SomeEnumWithString.second
+    ] => enumV2.rawValue
+    when_else => "unknown"
+}
+
+print(resultEnumTest1 ?? "nil")
+
+// associated values
+
+enum SomeEnumWithValues {
+    case first(name: String, value: Int)
+    case second(name: String, value: Double)
+}
+
+let enumV3 = SomeEnumWithValues.second(name: "second_value", value: 3.1415)
+
+let resultEnumTest2 = when(enumV3, rule: { value1, value2 in
+    switch (value1, value2) {
+    case (.first, .first), (.second, .second):
+        return true
+    default:
+        return false
+    }
+}) {
+    SomeEnumWithValues.first(name: "name", value: 123) => "FIRST"
+    SomeEnumWithValues.second(name: "name", value: 123) => "FIRST"
+    when_else => "unknown"
+}
+
+print(resultEnumTest2 ?? "nil")
+
+let resultEnumTest3 = when(enumV3, rule: checkSameCaseRule()) {
+    SomeEnumWithValues.first(name: "name", value: 123) => "FIRST"
+    SomeEnumWithValues.second(name: "name", value: 123) => "FIRST"
+    when_else => "unknown"
+}
+
+print(resultEnumTest3 ?? "nil")
