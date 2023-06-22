@@ -74,6 +74,18 @@ struct SwiftWhen<R> {
     static func buildExpression(_ expression: WhenItem<R>) -> [WhenItem<R>] {
         [expression]
     }
+
+    static func buildIf(_ value: [WhenItem<R>]?) -> [WhenItem<R>] {
+        value ?? []
+    }
+
+    static func buildEither(first components: [WhenItem<R>]) -> [WhenItem<R>] {
+        components
+    }
+
+    static func buildEither(second components: [WhenItem<R>]) -> [WhenItem<R>] {
+        components
+    }
 }
 
 @discardableResult func when<T: Comparable, R>(_ conditionVariable: T, @SwiftWhen<R> items: () -> [WhenItem<R>]) -> R? {
@@ -214,7 +226,6 @@ struct SwiftWhen<R> {
          
          }
     }
-    
     return nil
 }
 
@@ -243,6 +254,37 @@ func checkSameCaseRule<T>() -> (T, T) -> Bool {
             return false
         }
         return case1 == case2
+    }
+}
+
+func checkSameCaseAndValuesRule<T>() -> (T, T) -> Bool {
+    return { (value1, value2) -> Bool in
+        let mirror1 = Mirror(reflecting: value1)
+        let mirror2 = Mirror(reflecting: value2)
+
+        guard let case1 = mirror1.children.first?.label,
+              let case2 = mirror2.children.first?.label,
+              case1 == case2
+        else {
+            return false
+        }
+
+        guard let associatedValues1 = mirror1.children.first?.value,
+              let associatedValues2 = mirror2.children.first?.value else { return false }
+        let array1 = Mirror(reflecting: associatedValues1).children.map { $0.value }
+        let array2 = Mirror(reflecting: associatedValues2).children.map { $0.value }
+
+        if array1.count != array2.count {
+            return false
+        }
+
+        for (el1, el2) in zip(array1, array2) {
+            if String(describing: el1) != String(describing: el2) {
+                return false
+            }
+        }
+
+        return true
     }
 }
 
@@ -454,7 +496,7 @@ let resultEnumTest2 = when(enumV3, rule: { value1, value2 in
     }
 }) {
     SomeEnumWithValues.first(name: "name", value: 123) => "FIRST"
-    SomeEnumWithValues.second(name: "name", value: 123) => "FIRST"
+    SomeEnumWithValues.second(name: "name", value: 123) => "SECOND"
     when_else => "unknown"
 }
 
@@ -462,8 +504,95 @@ print(resultEnumTest2 ?? "nil")
 
 let resultEnumTest3 = when(enumV3, rule: checkSameCaseRule()) {
     SomeEnumWithValues.first(name: "name", value: 123) => "FIRST"
-    SomeEnumWithValues.second(name: "name", value: 123) => "FIRST"
+    SomeEnumWithValues.second(name: "name", value: 123) => "SECOND"
     when_else => "unknown"
 }
 
 print(resultEnumTest3 ?? "nil")
+
+let resultEnumTest4 = when(enumV3, rule: checkSameCaseAndValuesRule()) {
+    SomeEnumWithValues.second(name: "name", value: 123) => "wrong"
+    SomeEnumWithValues.second(name: "second_value", value: 3.1415) => "SECOND"
+    when_else => "unknown"
+}
+
+print(resultEnumTest4 ?? "nil")
+
+// check ifs
+
+
+var several = true
+let result60 = when(a) {
+    if several {
+        [
+            1..<20,
+            1...20,
+            5...,
+            ..<25,
+            ...15
+        ] => "In One of ranges"
+    }
+    15 => "15"
+    10 => "ten"
+    0 => "thero"
+    when_else => "unknown"
+}
+
+several = false
+let result61 = when(a) {
+    if several {
+        [
+            1..<20,
+            1...20,
+            5...,
+            ..<25,
+            ...15
+        ] => "In One of ranges"
+    }
+    15 => "15"
+    10 => "ten"
+    0 => "thero"
+    when_else => "unknown"
+}
+
+let result62 = when(a) {
+    if several {
+        [
+            1..<20,
+            1...20,
+            5...,
+            ..<25,
+            ...15
+        ] => "In One of ranges"
+    } else {
+        15 => "15"
+    }
+    10 => "ten"
+    0 => "thero"
+    when_else => "unknown"
+}
+
+several = true
+
+let result63 = when(a) {
+    if several {
+        [
+            1..<20,
+            1...20,
+            5...,
+            ..<25,
+            ...15
+        ] => "In One of ranges"
+    } else {
+        15 => "15"
+    }
+    10 => "ten"
+    0 => "thero"
+    when_else => "unknown"
+}
+
+
+print(result60 ?? "nil")
+print(result61 ?? "nil")
+print(result62 ?? "nil")
+print(result63 ?? "nil")
